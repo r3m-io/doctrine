@@ -6,7 +6,7 @@ use R3m\Io\App;
 
 use R3m\Io\Module\Controller;
 
-class Server extends Controller {
+class Doctrine extends Controller {
     const DIR = __DIR__ . '/';
 
     public static function environment(App $object, $response=null): object
