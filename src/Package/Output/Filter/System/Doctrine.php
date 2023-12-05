@@ -1,6 +1,6 @@
 <?php
 
-namespace Package\R3m\Io\Config\Output\Filter\System;
+namespace Package\R3m\Io\Doctrine\Output\Filter\System;
 
 use R3m\Io\App;
 
