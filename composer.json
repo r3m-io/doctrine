@@ -1,0 +1,24 @@
+{
+    "name" : "r3m_io/doctrine",
+    "description" : "r3m_io/doctrine see https://r3m.io for detailed usage",
+    "type" : "library",
+    "keywords" : ["node", "r3m", "library", "framework", "doctrine", "r3m.io"],
+    "homepage": "https://r3m.io",
+    "require" : {
+        "ext-posix": "*",
+        "ext-zlib": "*",
+        "ext-iconv": "*",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "r3m_io/framework": "*",
+        "doctrine/orm": "^2.8",
+        "doctrine/doctrine-bundle": "^2.4",
+        "doctrine/annotations": "^1.13",
+        "doctrine/persistence": "^2.2"
+    },
+    "license" : "MIT",
+    "authors" : [{
+        "name" : "Remco van der Velde",
+        "email" : "development@universeorange.com"
+    }]
+}
