@@ -59,7 +59,7 @@
             },
             "output": {
                 "filter":[
-                    "Package:R3m:Io:Doctrine:Output:Filter:System:Doctrine:environment"
+                    "R3m:Io:Doctrine:Output:Filter:System:Doctrine:environment"
                 ]
             },
             "where": "",
