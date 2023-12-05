@@ -1,0 +1,168 @@
+{
+    "System": {
+        "Doctrine": {
+            "Environment": {
+                "count": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "create": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "list": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "page": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "patch": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "put": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "read": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                },
+                "record": {
+                    "expose": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "name",
+                                "environment",
+                                "driver",
+                                "path",
+                                "host",
+                                "dbname",
+                                "user",
+                                "password",
+                                "logging"
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
