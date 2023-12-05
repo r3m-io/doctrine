@@ -12,7 +12,6 @@ class Doctrine extends Controller {
     public static function environment(App $object, $response=null): object
     {
         $result = [];
-        ddd($response);
         if(
             !empty($response) &&
             is_array($response)
@@ -21,16 +20,30 @@ class Doctrine extends Controller {
                 if(
                     is_array($record) &&
                     array_key_exists('name', $record) &&
-                    array_key_exists('options', $record)
+                    array_key_exists('environment', $record)
                 ){
-                    $result[$record['name']] = $record['options'];
+                    if($record['environment'] === '*'){
+                        $result[$record['name']] = $record;
+                    } else {
+                        if(!array_key_exists($record['name'], $result)){
+                            $result[$record['name']] = [];
+                        }
+                        $result[$record['name']][$record['environment']] = $record;
+                    }
                 }
                 elseif(
                     is_object($record) &&
                     property_exists($record, 'name') &&
-                    property_exists($record, 'options')
+                    property_exists($record, 'environment')
                 ){
-                    $result[$record->name] = $record->options;
+                    if($record->environment === '*'){
+                        $result[$record->name] = $record;
+                    } else {
+                        if(!array_key_exists($record->name, $result)){
+                            $result[$record->name] = [];
+                        }
+                        $result[$record->name][$record->environment] = $record;
+                    }
                 }
             }
         }
