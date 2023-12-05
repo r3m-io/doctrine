@@ -1,5 +1,5 @@
 {
-  "r3m_io-config-cli": {
+  "r3m_io-doctrine-cli": {
     "path": "r3m_io\/doctrine",
     "controller": "Package.R3m.Io.Doctrine.Controller.Cli.run",
     "language": "en",
