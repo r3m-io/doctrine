@@ -1,0 +1,18 @@
+{
+  "System": {
+    "Route": [
+      {
+        "#class": "System.Route",
+        "name": "r3m-io-cli-doctrine",
+        "path": "r3m_io\/doctrine",
+        "controller": "Package.R3m.Io.Doctrine.Controller.Cli.run",
+        "request": {
+          "language": "en"
+        },
+        "method": [
+          "CLI"
+        ]
+      }
+    ]
+  }
+}
