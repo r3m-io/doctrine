@@ -10,12 +10,13 @@
         "ext-iconv": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
-        "r3m_io/framework": "*",
+        "r3m_io/framework": "dev-root",
         "doctrine/orm": "^2.8",
         "doctrine/doctrine-bundle": "^2.4",
         "doctrine/annotations": "^1.13",
         "doctrine/persistence": "^2.2"
     },
+    "minimum-stability": "dev",
     "license" : "MIT",
     "authors" : [{
         "name" : "Remco van der Velde",
