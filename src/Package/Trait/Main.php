@@ -44,7 +44,6 @@ trait Main {
                 'doctrine' => '*'
             ];
             $config = $node->patch('System.Config', $node->role_system(), $patch);
-            $config = false;
             if(
                 is_array($config) &&
                 array_key_exists('node', $config)
