@@ -36,8 +36,8 @@ trait Main {
             $config &&
             is_array($config) &&
             array_key_exists('node', $config) &&
-            property_exists($config['node'], 'uuid') &&
-            !property_exists($config['node'], 'server')
+            property_exists($config['node'], 'uuid') // &&
+//            !property_exists($config['node'], 'doctrine')
         ){
             $patch = (object) [
                 'uuid' => $config['node']->uuid,
