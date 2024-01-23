@@ -44,7 +44,9 @@ trait Main {
                 'doctrine' => '*'
             ];
             $config = $node->patch('System.Config', $node->role_system(), $patch);
-            ddd($config);
+            if(!array_key_exists('node', $config)){
+                throw new Exception('Could not patch node System.Config');
+            }
         }
     }
 }
