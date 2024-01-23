@@ -47,8 +47,10 @@ trait Main {
             $config = false;
             if(
                 is_array($config) &&
-                !array_key_exists('node', $config)
+                array_key_exists('node', $config)
             ){
+                //nothing
+            } else {
                 throw new Exception('Could not patch node System.Config');
             }
         }
