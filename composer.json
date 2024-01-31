@@ -9,7 +9,7 @@
         "ext-zlib": "*",
         "ext-iconv": "*",
         "ext-pdo": "*",
-        "r3m_io/framework": "dev-root",
+        "r3m_io/framework": "dev-main",
         "doctrine/orm": "^2.8",
         "doctrine/doctrine-bundle": "^2.4",
         "doctrine/annotations": "^1.13",
