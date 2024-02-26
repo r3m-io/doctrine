@@ -254,6 +254,9 @@ class Entity extends Main
                     if (is_array($permission)) {
                         ddd($permission);
                     }
+                    if(property_exists($permission, 'name')){
+                        echo $permission->name . PHP_EOL;
+                    }
                     foreach ($expose as $action) {
                         if (
                             (
