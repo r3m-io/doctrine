@@ -231,6 +231,7 @@ class Entity extends Main
         $record = [];
         $is_expose = false;
         foreach ($roles as $role) {
+            ddd($role->permission);
             if (
                 property_exists($role, 'uuid') &&
                 property_exists($role, 'name') &&
