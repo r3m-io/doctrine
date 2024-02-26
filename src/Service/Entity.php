@@ -238,11 +238,7 @@ class Entity extends Main
                         ddd($permission);
                     }
                     echo $permission->getName() . PHP_EOL;
-
-                    ddd($expose);
-
                     foreach ($expose as $action) {
-                        d($action);
                         if (
                             (
                                 $permission->getName() === str_replace('.', ':', Controller::name($class)) . ':' . str_replace('_', '.', $function) &&
