@@ -232,6 +232,7 @@ class Entity extends Main
         $is_expose = false;
         foreach ($roles as $role) {
             $permissions = $role->getPermissions();
+            ddd($permissions);
             if (is_array($permissions)) {
                 foreach ($permissions as $permission) {
                     if (is_array($permission)) {
