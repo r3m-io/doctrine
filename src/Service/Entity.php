@@ -232,24 +232,20 @@ class Entity extends Main
         $is_expose = false;
         foreach ($roles as $role) {
             $permissions = $role->getPermissions();
-            if (
-                property_exists($role, 'name') &&
-                is_array($permissions)
-            ) {
+            if (is_array($permissions)) {
                 foreach ($permissions as $permission) {
                     if (is_array($permission)) {
                         ddd($permission);
                     }
-                    if(property_exists($permission, 'name')){
-                        echo $permission->name . PHP_EOL;
-                    }
+                    echo $permission->getName() . PHP_EOL;
+
                     foreach ($expose as $action) {
+                        d($action);
                         if (
                             (
-                                property_exists($permission, 'name') &&
-                                $permission->name === str_replace('.', ':', Controller::name($class)) . ':' . str_replace('_', '.', $function) &&
+                                $permission->getName() === str_replace('.', ':', Controller::name($class)) . ':' . str_replace('_', '.', $function) &&
                                 property_exists($action, 'role') &&
-                                $action->role === $role->name
+                                $action->role === $role->getName()
                             )
                             ||
                             (
