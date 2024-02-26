@@ -271,7 +271,7 @@ class Entity extends Main
                                     $assertion = $property;
                                     $explode = explode(':', $property, 2);
                                     $compare = null;
-                                    $method = $explode[0];
+                                    $method = 'get' . ucfirst($explode[0]);
                                     $value = $node->{$method}();
                                     if (array_key_exists(1, $explode)) {
                                         $record_property = $value;
