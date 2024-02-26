@@ -367,6 +367,7 @@ class Entity extends Main
                                             }
                                         }
                                     } else {
+                                        d($node);
                                         if ($node->has($property)) {
                                             $record[$property] = $node->get($property);
                                         }
