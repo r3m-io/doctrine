@@ -230,7 +230,7 @@ class Entity extends Main
         }
         $record = [];
         $is_expose = false;
-        ddd($role);
+        ddd($roles);
         foreach ($roles as $role) {
             if (
                 property_exists($role, 'uuid') &&
