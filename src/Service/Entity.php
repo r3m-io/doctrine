@@ -204,9 +204,8 @@ class Entity extends Main
      * @throws Exception
      * @throws AuthorizationException
      */
-    public function expose($node, $expose=[], $class='', $function='', $internalRole=false, $parentRole=false): Storage
+    public static function expose(App $object, $node, $expose=[], $class='', $function='', $internalRole=false, $parentRole=false): Storage
     {
-        $object = $this->object();
         if (!is_array($expose)) {
             return new Storage();
         }
@@ -332,7 +331,8 @@ class Entity extends Main
                                                             'role' => $action->role,
                                                         ];
                                                     }
-                                                    $child = $this->expose(
+                                                    $child = Entity::expose(
+                                                        $object,
                                                         $child,
                                                         $child_expose,
                                                         $property,
@@ -368,7 +368,8 @@ class Entity extends Main
                                                         'role' => $action->role,
                                                     ];
                                                 }
-                                                $child = $this->expose(
+                                                $child = Entity::expose(
+                                                    $object,
                                                     $child,
                                                     $child_expose,
                                                     $property,
