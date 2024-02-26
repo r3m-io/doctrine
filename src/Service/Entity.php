@@ -271,8 +271,10 @@ class Entity extends Main
                                     $assertion = $property;
                                     $explode = explode(':', $property, 2);
                                     $compare = null;
+                                    $method = $explode[0];
+                                    $value = $node->{$method}();
                                     if (array_key_exists(1, $explode)) {
-                                        $record_property = $node->get($explode[0]);
+                                        $record_property = $value;
                                         $compare = $explode[1];
                                         $attribute = $explode[0];
                                         if ($compare) {
@@ -291,9 +293,9 @@ class Entity extends Main
                                         if (
                                             property_exists($action->object->$property, 'multiple') &&
                                             $action->object->$property->multiple === true &&
-                                            $node->has($property)
+                                            $value !== null
                                         ) {
-                                            $array = $node->get($property);
+                                            $array = $value;
 
                                             if(is_array($array) || is_object($array)){
                                                 $record[$property] = [];
@@ -329,10 +331,8 @@ class Entity extends Main
                                                 //leave intact for read without parse
                                                 $record[$property] = $array;
                                             }
-                                        } elseif (
-                                            $node->has($property)
-                                        ) {
-                                            $child = $node->get($property);
+                                        } elseif ($value !== null) {
+                                            $child = $value;
                                             if (!empty($child)) {
                                                 $record[$property] = null;
                                                 $child = new Storage($child);
@@ -367,9 +367,8 @@ class Entity extends Main
                                             }
                                         }
                                     } else {
-                                        d($node);
-                                        if ($node->has($property)) {
-                                            $record[$property] = $node->get($property);
+                                        if ($value !== null) {
+                                            $record[$property] = $value;
                                         }
                                     }
                                 }
