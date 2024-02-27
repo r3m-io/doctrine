@@ -48,11 +48,7 @@ class Entity extends Main
      */
     public static function create(App $object, EntityManager $entityManager, $entity=null, $request=[]): array
     {
-        d($entity);
-        d($request);
-        ddd($entityManager);
         $function = __FUNCTION__;
-        $request = Permission::request($object, $entity, $function);
         if(empty($request)){
             throw new Exception('Request is empty...');
         }
@@ -80,8 +76,9 @@ class Entity extends Main
                     $toArray = Entity::expose_get(
                         $object,
                         $entity,
-                        $entity . '.' . $function . '.expose'
+                        $entity . '.' . $function . '.output'
                     );
+                    ddd($toArray);
                     $record = [];
                     $record = Entity::expose(
                         $object,
