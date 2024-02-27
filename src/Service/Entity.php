@@ -77,7 +77,6 @@ class Entity extends Main
                     catch(Exception $exception){
                         throw new Exception('Cannot create entity: ' . $entity . ', error: ' . $exception->getMessage());
                     }
-
                     $data['node'] = $node;
                 } else {
                     $data['error'] = $validate->test;
