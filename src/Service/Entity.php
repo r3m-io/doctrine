@@ -73,6 +73,9 @@ class Entity extends Main
                     );
                     $entityManager->persist($node);
                     $entityManager->flush();
+
+                    ddd($node);
+
                     $toArray = Entity::expose_get(
                         $object,
                         $entity,
