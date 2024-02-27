@@ -1,21 +1,953 @@
 <?php
 namespace R3m\Io\Doctrine\Service;
 
-use R3m\Io\App;
 
+use DateTime;
+use ReflectionObject;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Mapping\ManyToMany;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping\OneToOne;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+
+use Host\Api\Workandtravel\World\Service\User as UserService;
+
+use R3m\Io\App;
 use R3m\Io\Module\Core;
-use R3m\Io\Module\Data as Storage;
+use R3m\Io\Module\Database;
 use R3m\Io\Module\File;
+use R3m\Io\Module\Limit;
 use R3m\Io\Module\Parse;
-use R3m\Io\Module\Controller;
 
 use Exception;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\Query\QueryException;
+
 use R3m\Io\Exception\AuthorizationException;
 use R3m\Io\Exception\ObjectException;
+use R3m\Io\Exception\FileWriteException;
+
 
 class Entity extends Main
 {
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     * @throws ObjectException
+     * @throws AuthorizationException
+     * @throws FileWriteException
+     */
+    public static function create(App $object, EntityManager $entityManager, $entity=null, $request=[]): array
+    {
+        d($entity);
+        d($request);
+        ddd($entityManager);
+        $function = __FUNCTION__;
+        $request = Permission::request($object, $entity, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $validate_url = Entity::getValidatorUrl($object, $entity);
+        if(File::exist($validate_url)){
+            $validate = Main::validate($object, $validate_url,  $entity . '.create');
+            if($validate) {
+                $data = [];
+                if($validate->success === true) {
+                    $className = $object->config('doctrine.entity.prefix') . $entity;
+                    $class = new $className();
+                    if(method_exists($class, 'setObject')){
+                        $class->setObject($object);
+                    }
+                    if(method_exists($class, 'setEntityManager')){
+                        $class->setEntityManager($entityManager);
+                    }
+                    $node = Entity::import(
+                        $class,
+                        $request
+                    );
+                    $entityManager->persist($node);
+                    $entityManager->flush();
+                    $toArray = Entity::expose_get(
+                        $object,
+                        $entity,
+                        $entity . '.' . $function . '.expose'
+                    );
+                    $record = [];
+                    $record = Entity::expose(
+                        $object,
+                        $node,
+                        $toArray,
+                        $entity,
+                        $function,
+                        $record
+                    );
+                    $data['node'] = $record;
+                } else {
+                    $data['error'] = $validate->test;
+                }
+                return $data;
+            } else {
+                throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+            }
+        }
+        throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+    }
+
+
+    /**
+     * @throws ObjectException
+     * @throws ORMException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws AuthorizationException
+     * @throws FileWriteException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function readByUuid(App $object, $entity, $uuid): array
+    {
+        $function = 'read';
+        Permission::request($object, $entity, $function);
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'uuid' => $uuid
+        ]);
+        if($node) {
+            $data = [];
+            $record = [];
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.read.expose'
+            );
+            $record = Entity::expose(
+                $object,
+                $node,
+                $toArray,
+                $entity,
+                $function,
+                $record
+            );
+            $data['node'] = $record;
+            return $data;
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with uuid: ' . $uuid);
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
+     * @throws AuthorizationException
+     * @throws FileWriteException
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public static function readById(App $object, $entity, $id): array
+    {
+        $function = 'read';
+        Permission::request($object, $entity, $function);
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'id' => $id
+        ]);
+        if($node) {
+            $data = [];
+            $record = [];
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.' . $function . '.expose'
+            );
+            $record = Entity::expose(
+                $object,
+                $node,
+                $toArray,
+                $entity,
+                $function,
+                $record
+            );
+            $data['node'] = $record;
+            return $data;
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with id: ' . $id);
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws Exception
+     */
+    public static function update(App $object, $entityManager, $node, $entity): array
+    {
+        $function = __FUNCTION__;
+        $request = Permission::request($object, $entity, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        if(count($request) <= 1){
+            throw new Exception('Request need more data...');
+        }
+        $validate_url = Entity::getValidatorUrl($object, $entity);
+        if(File::exist($validate_url)) {
+            $validate = Main::validate($object, $validate_url, $entity . '.update');
+            if ($validate) {
+                if (
+                    property_exists($validate, 'success') &&
+                    $validate->success === true
+                ) {
+                    if(method_exists($node, 'setObject')){
+                        $node->setObject($object);
+                    }
+                    if(method_exists($node, 'setEntityManager')){
+                        $node->setEntityManager($entityManager);
+                    }
+                    $node = Entity::import(
+                        $node,
+                        $request
+                    );
+                    $entityManager->persist($node);
+                    $entityManager->flush();
+                    $data = [];
+                    $record = [];
+                    $toArray = Entity::expose_get(
+                        $object,
+                        $entity,
+                        $entity . '.update.expose'
+                    );
+                    $record = Entity::expose(
+                        $object,
+                        $node,
+                        $toArray,
+                        $entity,
+                        $function,
+                        $record
+                    );
+                    $data['node'] = $record;
+                    return $data;
+                }
+                elseif(property_exists($validate, 'test')) {
+                    $data = [];
+                    $data['error'] = $validate->test;
+                    return $data;
+                } else {
+                    $data = [];
+                    $data['error'] = 'Invalid validate, url: ' . $validate_url;
+                    return $data;
+                }
+            } else {
+                $data = [];
+                $data['error'] = 'Invalid validate, url: ' . $validate_url;
+                return $data;
+            }
+        }
+        throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws Exception
+     */
+    public static function updateByUuid(App $object, $entity, $uuid): array
+    {
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'uuid' => $uuid
+        ]);
+        if($node) {
+            $update = Entity::update($object, $entityManager, $node, $entity);
+            if($update){
+                return $update;
+            }
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with uuid: ' . $uuid);
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws Exception
+     */
+    public static function updateById(App $object, $entity, $id): array
+    {
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'id' => $id
+        ]);
+        if($node) {
+            $update = Entity::update($object, $entityManager, $node, $entity);
+            if($update){
+                return $update;
+            }
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with id: ' . $id);
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws R3m\Io\Exception\ObjectException
+     * @throws Doctrine\ORM\Exception\ORMException
+     * @throws R3m\Io\Exception\AuthorizationException
+     * @throws R3m\Io\Exception\FileWriteException
+     * @throws Exception
+     */
+    private static function delete(App $object, $entityManager, $node, $entity): array
+    {
+        $function = __FUNCTION__;
+        $request = Permission::request($object, $entity, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        if(count($request) < 1){
+            throw new Exception('Request need more data...');
+        }
+        if(method_exists($node, 'setIsDeleted')){
+            $node->setIsDeleted(new DateTime());
+            $entityManager->persist($node);
+            $entityManager->flush();
+            $data = [];
+            $record = [];
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.delete.expose'
+            );
+            $record = Entity::expose(
+                $object,
+                $node,
+                $toArray,
+                $entity,
+                $function,
+                $record
+            );
+            $data['node'] = $record;
+            return $data;
+        } else {
+            $entityManager->remove($node);
+            $entityManager->flush();
+            $data = [];
+            $record = [];
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.delete.expose'
+            );
+            $record = Entity::expose(
+                $object,
+                $node,
+                $toArray,
+                $entity,
+                $function,
+                $record
+            );
+            $data['node'] = $record;
+            $data['node']['isDeleted'] = new DateTime();
+            return $data;
+        }
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws Exception
+     */
+    public static function deleteByUuid(App $object, $entity, $uuid): array
+    {
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'uuid' => $uuid
+        ]);
+        //add user id
+        if($node) {
+            $delete = Entity::delete($object, $entityManager, $node, $entity);
+            return $delete;
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with uuid: ' . $uuid);
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws Exception
+     */
+    public static function deleteById(App $object, $entity, $id): array
+    {
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
+        $node = $repository->findOneBy([
+            'id' => $id
+        ]);
+        if($node) {
+            $delete = Entity::delete($object, $entityManager, $node, $entity);
+            return $delete;
+        }
+        throw new Exception('Cannot find entity: ' . $entity .', with id: ' . $id);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public static function add(App $object, $entity1=null, $entity2=null): array
+    {
+        return Entity::add_or_set($object, $entity1, $entity2, 'add');
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public static function set(App $object, $entity1=null, $entity2=null): array
+    {
+        return Entity::add_or_set($object, $entity1, $entity2, 'set');
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public static function add_or_set(App $object, $entity1=null, $entity2=null, $function='add'): array
+    {
+        $request = Permission::request($object, $entity1 . '.' . $entity2, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $entity = $entity1 . '.' . $entity2;
+        $type = $entity1 . '.' . $entity2;
+        $validate_url = Entity::getValidatorUrl($object, $entity);
+        if(!File::exist($validate_url)) {
+            $entity = $entity2 . '.' . $entity1;
+            $type = $entity2 . '.' . $entity1;
+            $validate_url = Entity::getValidatorUrl($object, $entity);
+            if(!File::exist($validate_url)) {
+                throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+            }
+        }
+        $validate = Main::validate($object, $validate_url,  $type . '.' . $function);
+        if($validate) {
+            if(
+                property_exists($validate, 'success') &&
+                $validate->success === true
+            ) {
+                $entityName1 = $object->config('doctrine.entity.prefix') . $entity1;
+                $repository = $entityManager->getRepository($entityName1);
+                $id = lcfirst($entity1) . '_id';
+                if(array_key_exists($id, $request)){
+                    $node1 = $repository->findOneBy([
+                        'id' => $request[$id]
+                    ]);
+                    if(empty($node1)){
+                        throw new Exception('Could not find entity (' . $entity1 . ') with id: ' . $request[$id]);
+                    }
+                } else {
+                    throw new Exception('Could not find request with id: ' . $id);
+                }
+                $entityName2 = $object->config('doctrine.entity.prefix') . $entity2;
+                $repository = $entityManager->getRepository($entityName2);
+                $id = lcfirst($entity2) . '_id';
+                if(array_key_exists($id, $request)){
+                    $node2 = $repository->findOneBy([
+                        'id' => $request[$id]
+                    ]);
+                    if(empty($node2)){
+                        throw new Exception('Could not find entity (' . $entity2 . ') with id: ' . $request[$id]);
+                    }
+                } else {
+                    throw new Exception('Could not find request with id: ' . $id);
+                }
+                $method = $function . ucfirst($entity2);
+                if(method_exists($node1, $method)){
+                    $node1->$method($node2);
+                    $entityManager->persist($node1);
+                    $entityManager->flush();
+                } else {
+                    throw new Exception('Entity: ' . $entity1 . ' does not have this method: ' . $method);
+                }
+                $entity = $entity1 . '.' . $entity2;
+                $data = [];
+                $record = [];
+                $toArray = Entity::expose_get(
+                    $object,
+                    $entity,
+                    $entity . '.' . $function .'.expose'
+                );
+                $record = Entity::expose(
+                    $object,
+                    $node1,
+                    $toArray,
+                    $entity,
+                    $function,
+                    $record
+                );
+                $data['node'] = $record;
+            }
+            elseif(property_exists($validate, 'test')) {
+                $data = [];
+                $data['error'] = $validate->test;
+            } else {
+                throw new Exception('Invalid validate, url: ' . $validate_url);
+            }
+            return $data;
+        }
+        throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public static function get_relation(App $object, $entity1=null, $entity2=null, $single_or_multiple='single'): array
+    {
+        $function = 'get';
+        $request = Permission::request($object, $entity1 . '.' . $entity2, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $entity = $entity1 . '.' . $entity2;
+        $type = $entity1 . '.' . $entity2;
+
+        $entityName1 = $object->config('doctrine.entity.prefix') . $entity1;
+        $repository = $entityManager->getRepository($entityName1);
+        $id = lcfirst($entity1) . '_id';
+        if(array_key_exists($id, $request)) {
+            $node1 = $repository->findOneBy([
+                'id' => $request[$id]
+            ]);
+            if (empty($node1)) {
+                throw new Exception('Could not find entity (' . $entity1 . ') with id: ' . $request[$id]);
+            }
+        } else {
+            throw new Exception('Could not find request with id: ' . $id);
+        }
+        if($single_or_multiple === 'single'){
+            $method = $function . ucfirst($entity2);
+        } else {
+            $method = $function . ucfirst($entity2) . 's';
+        }
+        if(method_exists($node1, $method)){
+            $entity = $entity1 . '.' . $entity2;
+            $data = [];
+            $record = [];
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.' . $function .'.expose'
+            );
+            $record = Entity::expose(
+                $object,
+                $node1,
+                $toArray,
+                $entity,
+                $function,
+                $record
+            );
+            $data['node'] = $record;
+            return $data;
+        }
+        throw new Exception('Cannot find method: ' . $method . ' at: ' . $entity1);
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws Exception
+     */
+    public static function delete_relation(App $object, $entity1=null, $entity2=null): array
+    {
+        $function = 'delete';
+        $request = Permission::request($object, $entity1 . '.' . $entity2, $function);
+        if(empty($request)){
+            throw new Exception('Request is empty...');
+        }
+        if(count($request) < 2){
+            throw new Exception('Request need more data...');
+        }
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $entity = $entity1 . '.' . $entity2;
+        $type = $entity1 . '.' . $entity2;
+        $validate_url = Entity::getValidatorUrl($object, $entity);
+        if(!File::exist($validate_url)) {
+            $entity = $entity2 . '.' . $entity1;
+            $type = $entity2 . '.' . $entity1;
+            $validate_url = Entity::getValidatorUrl($object, $entity);
+            if(!File::exist($validate_url)) {
+                throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+            }
+        }
+        $validate = Main::validate($object, $validate_url,  $type . '.delete');
+        if($validate) {
+            if($validate->success === true) {
+                $entityName1 = $object->config('doctrine.entity.prefix') . $entity1;
+                $repository = $entityManager->getRepository($entityName1);
+                $node1_id = strtolower($entity1) . '_id';
+                if(array_key_exists($node1_id, $request)){
+                    $node1 = $repository->findOneBy([
+                        'id' => $request[$node1_id]
+                    ]);
+                    if(empty($node1)){
+                        throw new Exception('Could not find entity (' . $entity1 . ') with id: ' . $request[$node1_id]);
+                    }
+                } else {
+                    throw new Exception('Could not find request with id: ' . $node1_id);
+                }
+                $entityName2 = $object->config('doctrine.entity.prefix') . $entity2;
+                $repository = $entityManager->getRepository($entityName2);
+                $node2_id = strtolower($entity2) . '_id';
+                if(array_key_exists($node2_id, $request)){
+                    $node2 = $repository->findOneBy([
+                        'id' => $request[$node2_id]
+                    ]);
+                    if(empty($node2)){
+                        throw new Exception('Could not find entity (' . $entity2 . ') with id: ' . $request[$node2_id]);
+                    }
+                } else {
+                    throw new Exception('Could not find request with id: ' . $node2_id);
+                }
+                $method = 'delete' . ucfirst($entity2);
+                if(method_exists($node1, $method)){
+                    $is_deleted = $node1->$method($node2);
+                    if($is_deleted){
+                        $entityManager->persist($node1);
+                        $entityManager->flush();
+                    } else {
+                        throw new Exception('Could not delete entity (' . $entity2 . ') with id: ' .  $request[$node2_id] .' from entity (' . $entity1 .') with id: ' . $request[$node1_id]);
+                    }
+                } else {
+                    throw new Exception('Method doesn\'t exist: ' . $method);
+                }
+                $entity = $entity1 . '.' . $entity2;
+                $data = [];
+                $record = [];
+                $toArray = Entity::expose_get(
+                    $object,
+                    $entity,
+                    $entity . '.' . $function .'.expose'
+                );
+                $record = Entity::expose(
+                    $object,
+                    $node1,
+                    $toArray,
+                    $entity,
+                    $function,
+                    $record
+                );
+                $data['node'] = $record;
+            } else {
+                $data = [];
+                $data['error'] = $validate->test;
+            }
+            return $data;
+        } else {
+            throw new Exception('Cannot validate entity at: ' . Entity::getValidatorUrl($object, $entity));
+        }
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws QueryException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public static function list(App $object, $entity): array
+    {
+        $function = __function__;
+        $request = Permission::request($object, $entity, $function, $user, $fetchJoinCollection);
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $pagination = $object->request('pagination');
+        $filter = Entity::filter($object, $where, $parameters);
+        $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
+        $alias = lcfirst($entity);
+        $data = [];
+        if(
+            $pagination === false ||
+            $pagination === 'false'
+        ){
+            $data['nodeList'] = [];
+            $qb = $entityManager->createQueryBuilder();
+            $entityName = $object->config('doctrine.entity.prefix') . $entity;
+            $joins = Entity::get_joins($object, $entity);
+            $qb->select(['count(' . $alias . '.id)'])
+                ->from($entityName, $alias);
+            foreach($joins as $join){
+                $qb->leftJoin($join['join'], $join['alias']);
+                foreach($where as $nr => $is){
+                    $where[$nr] = str_replace($join['join'], $join['alias'], $is);
+                }
+            }
+            if(is_array($where)){
+                $count_where = count($where);
+                if($count_where >= 1){
+                    $qb->where($where[0]);
+                    if($count_where > 1){
+                        for($i = 1; $i < $count_where; $i++){
+                            $qb->andWhere($where[$i]);
+                        }
+                    }
+                }
+            }
+            $count = $qb->setParameters($parameters)
+                ->getQuery()
+                ->getSingleScalarResult();
+            $data['count'] = (int) $count;
+            $qb = $entityManager->createQueryBuilder();
+            $qb->select([$alias])
+                ->from($entityName, $alias);
+            foreach($joins as $join){
+                $qb->leftJoin($join['join'], $join['alias']);
+            }
+            $count_where = count($where);
+            if($count_where >= 1){
+                $qb->where($where[0]);
+                if($count_where > 1){
+                    for($i = 1; $i < $count_where; $i++){
+                        $qb->andWhere($where[$i]);
+                    }
+                }
+            }
+            foreach($order as $key => $value){
+                $qb->orderBy($alias . '.' . $key, strtoupper($value));
+            }
+            $qb->setParameters($parameters);
+            $result = $qb->getQuery()->getResult();
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.' . $function .'.expose'
+            );
+            foreach($result as $node){
+                $record = [];
+                $record = Entity::expose(
+                    $object,
+                    $node,
+                    $toArray,
+                    $entity,
+                    $function,
+                    $record
+                );
+                $data['nodeList'][] = $record;
+            }
+            $data['filter'] = Entity::castValue($filter);
+            $data['order'] = $object->request('order');
+        } else {
+            if($object->request('page')){
+                $page = (int) $object->request('page');
+            } else {
+                $page = 1;
+            }
+            $limit = Limit::LIMIT;
+            $settings_url = $object->config('controller.dir.data') . 'Settings' . $object->config('extension.json');
+            $settings =  $object->data_read($settings_url);
+            if($settings){
+                if($settings->data('component.default.limit')){
+                    $limit = $settings->data('component.default.limit');
+                }
+            }
+            if($object->request('limit')){
+                $limit = (int) $object->request('limit');
+                if($limit > Limit::MAX){
+                    $limit = Limit::MAX;
+                }
+            }
+            $firstResult = $page * $limit - $limit;
+            $data['nodeList'] = [];
+            $qb = $entityManager->createQueryBuilder();
+            $entityName = $object->config('doctrine.entity.prefix') . $entity;
+            $joins = Entity::get_joins($object, $entity);
+            $qb->select(['count(' . $alias . '.id)'])
+                ->from($entityName, $alias);
+            foreach($joins as $join){
+                $qb->leftJoin($join['join'], $join['alias']);
+                foreach($where as $nr => $is){
+                    $where[$nr] = str_replace($join['join'], $join['alias'], $is);
+                }
+            }
+            if(is_array($where)){
+                $count_where = count($where);
+                if($count_where >= 1){
+                    $qb->where($where[0]);
+                    if($count_where > 1){
+                        for($i = 1; $i < $count_where; $i++){
+                            $qb->andWhere($where[$i]);
+                        }
+                    }
+                }
+            }
+            $qb->setParameters($parameters);
+            $count = $qb
+                ->getQuery()
+                ->getSingleScalarResult();
+            $data['count'] = (int) $count;
+            $data['page'] = $page;
+            $data['limit'] = $limit;
+            $qb = $entityManager->createQueryBuilder();
+            $qb->select([$alias])
+                ->from($entityName, $alias);
+            foreach($joins as $join){
+                $qb->leftJoin($join['join'], $join['alias']);
+            }
+            $count_where = count($where);
+            if($count_where >= 1){
+                $qb->where($where[0]);
+                if($count_where > 1){
+                    for($i = 1; $i < $count_where; $i++){
+                        $qb->andWhere($where[$i]);
+                    }
+                }
+            }
+            foreach($order as $key => $value){
+                $qb->orderBy($alias . '.' . $key, strtoupper($value));
+            }
+            $qb->setParameters($parameters)
+                ->setFirstResult($firstResult)
+                ->setMaxResults($limit);
+            $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection);
+            $toArray = Entity::expose_get(
+                $object,
+                $entity,
+                $entity . '.list.expose'
+            );
+            foreach ($paginator as $node) {
+                $record = [];
+                $record = Entity::expose(
+                    $object,
+                    $node,
+                    $toArray,
+                    $entity,
+                    $function,
+                    $record
+                );
+                $data['nodeList'][] = $record;
+            }
+            $data['max'] = (int) ceil($data['count'] / $data['limit']);
+            $data['filter'] = Entity::castValue($filter);
+            $data['order'] = $object->request('order');
+        }
+        return $data;
+    }
+
+    /**
+     * @throws ObjectException
+     * @throws QueryException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    public static function page(App $object, $entity, $id): array
+    {
+        $request = Permission::request($object, $entity, 'page');
+        $entityManager = Database::entityManager($object, ['name' => Main::API]);
+        $object->request('delete', 'id');
+        $filter = Entity::filter($object, $where, $parameters);
+        $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
+        $alias = lcfirst($entity);
+        $data = [];
+        $limit = Limit::LIMIT;
+        $settings_url = $object->config('controller.dir.data') . 'Settings' . $object->config('extension.json');
+        $settings =  $object->data_read($settings_url);
+        if($settings){
+            if($settings->data('component.default.limit')){
+                $limit = $settings->data('component.default.limit');
+            }
+        }
+        if($object->request('limit')){
+            $limit = (int) $object->request('limit');
+            if($limit > Limit::MAX){
+                $limit = Limit::MAX;
+            }
+        }
+        $page = 1;
+        $firstResult = $page * $limit - $limit;
+        $qb = $entityManager->createQueryBuilder();
+        $entityName = $object->config('doctrine.entity.prefix') . $entity;
+        $joins = Entity::get_joins($object, $entity);
+        $qb->select(['count(' . $alias . '.id)'])
+            ->from($entityName, $alias);
+        foreach($joins as $join){
+            $qb->leftJoin($join['join'], $join['alias']);
+            foreach($where as $nr => $is){
+                $where[$nr] = str_replace($join['join'], $join['alias'], $is);
+            }
+        }
+        if(is_array($where)){
+            $count_where = count($where);
+            if($count_where >= 1){
+                $qb->where($where[0]);
+                if($count_where > 1){
+                    for($i = 1; $i < $count_where; $i++){
+                        $qb->andWhere($where[$i]);
+                    }
+                }
+            }
+        }
+        $qb->setParameters($parameters);
+        $count = $qb
+            ->getQuery()
+            ->getSingleScalarResult();
+        $data['count'] = $count;
+        $data['limit'] = $limit;
+        $data['max'] = ceil($data['count'] / $data['limit']);
+        $qb = $entityManager->createQueryBuilder();
+        $qb->select([$alias])
+            ->from($entityName, $alias);
+        foreach($joins as $join){
+            $qb->leftJoin($join['join'], $join['alias']);
+        }
+        $count_where = count($where);
+        if($count_where >= 1){
+            $qb->where($where[0]);
+            if($count_where > 1){
+                for($i = 1; $i < $count_where; $i++){
+                    $qb->andWhere($where[$i]);
+                }
+            }
+        }
+        foreach($order as $key => $value){
+            $qb->orderBy($alias . '.' . $key, strtoupper($value));
+        }
+        $qb->setParameters($parameters)
+            ->setFirstResult($firstResult)
+            ->setMaxResults($limit);
+
+        $is_found = false;
+        $fetchJoinCollection = false;
+
+        for($page=1; $page <= $data['max']; $page++){
+            $firstResult = $page * $limit - $limit;
+            $qb->setFirstResult($firstResult)
+                ->setMaxResults($limit);
+            $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection);
+            foreach ($paginator as $entity) {
+                if($entity->getId() === $id){
+                    $is_found = true;
+                    break 2;
+                }
+            }
+        }
+        if($is_found){
+            $data['page'] = $page;
+        } else {
+            throw new Exception('Item not found with id: ' . $id);
+        }
+        $data['filter'] = Entity::castValue($filter);
+        $data['order'] = $object->request('order');
+        return $data;
+    }
 
     /**
      * @throws ObjectException
@@ -42,7 +974,6 @@ class Entity extends Main
      * @throws Exception
      * @throws AuthorizationException
      */
-    /*
     public static function expose(App $object, $node, $toArray=[], $entity='', $function='', $record=[], $internalRole=false, $parentScope=false): array
     {
         if(!is_array($toArray)){
@@ -60,7 +991,7 @@ class Entity extends Main
         if($internalRole){
             $roles[] = $internalRole; //same as parent
         } else {
-//            $roles = Permission::getAccessControl($object, $entity, $function);
+            $roles = Permission::getAccessControl($object, $entity, $function);
             try {
                 $user = User::getByAuthorization($object);
                 if($user){
@@ -100,7 +1031,7 @@ class Entity extends Main
                                 $function,
                                 ['child', 'children']
                             ) &&
-                               property_exists($action, 'scope') &&
+                            property_exists($action, 'scope') &&
                             $action->scope === $parentScope
                         )
                     ) {
@@ -137,7 +1068,7 @@ class Entity extends Main
                                 if (
                                     property_exists($action, 'objects') &&
                                     property_exists($action->objects, $attribute) &&
-                                    property_exists($action->objects->$attribute, 'toArray')
+                                    property_exists($action->objects->$attribute, 'expose')
                                 ) {
                                     if (
                                         property_exists($action->objects->$attribute, 'multiple') &&
@@ -149,10 +1080,10 @@ class Entity extends Main
                                         foreach ($array as $child) {
                                             $child_entity = explode('Entity\\', get_class($child));
                                             $child_record = [];
-                                            $child_record = \Host\Api\Workandtravel\World\Service\Entity::toArray(
+                                            $child_record = Entity::expose(
                                                 $object,
                                                 $child,
-                                                $action->objects->$attribute->toArray,
+                                                $action->objects->$attribute->expose,
                                                 $child_entity[1],
                                                 'children',
                                                 $child_record,
@@ -168,10 +1099,10 @@ class Entity extends Main
                                         $child = $node->$method();
                                         if (!empty($child)) {
                                             $child_entity = explode('Entity\\', get_class($child));
-                                            $record[$attribute] = Entity::toArray(
+                                            $record[$attribute] = Entity::expose(
                                                 $object,
                                                 $child,
-                                                $action->objects->$attribute->toArray,
+                                                $action->objects->$attribute->expose,
                                                 $child_entity[1],
                                                 'child',
                                                 $record[$attribute],
@@ -197,264 +1128,337 @@ class Entity extends Main
         }
         return $record;
     }
-    */
 
     /**
      * @throws ObjectException
-     * @throws Exception
-     * @throws AuthorizationException
+     * @throws \ReflectionException
      */
-    public static function expose(App $object, $node, $expose=[], $class='', $function='', $internalRole=false, $parentRole=false): Storage
-    {
-        if (!is_array($expose)) {
-            return new Storage();
-        }
-        $roles = [];
-        if ($internalRole) {
-            $roles[] = $internalRole; //same as parent
-        } else {
-//            $roles = Permission::getAccessControl($object, $class, $function);
-            try {
-                /*
-                $user = User::getByAuthorization($object);
-                if ($user) {
-                    $roles = $user->getRolesByRank('asc');
-                }
-                */
-            } catch (Exception $exception) {
-
+    private static function filter(App $object, &$where=[], &$parameters=[]){
+        $request = clone $object->request();
+        unset($request->limit);
+        unset($request->pagination);
+        unset($request->page);
+        unset($request->order);
+        unset($request->request);
+        unset($request->entity);
+        unset($request->authorization);
+        $alias = lcfirst($object->request('entity'));
+        $filter = $request;
+        $where = [];
+        $parameters = [];
+        foreach($request as $attribute => $array){
+            if(substr($attribute, 0, 1) === '@'){
+                $attribute = substr($attribute, 1);
             }
-        }
-        if (empty($roles)) {
-            throw new Exception('Roles failed...');
-        }
-        $record = [];
-        $is_expose = false;
-        foreach ($roles as $role) {
-            $permissions = $role->getPermissions();
-            if (is_array($permissions)) {
-                foreach ($permissions as $permission) {
-                    if (is_array($permission)) {
-                        ddd($permission);
+            $is_not = false;
+            if(is_object($array)){
+                $array = Core::object_array($array);
+            }
+            if(Core::is_array_nested($array)){
+                if(array_key_exists('not', $array)){
+                    $is_not = true;
+                    $array = $array['not'];
+                }
+            }
+            $array = Entity::castValue($array);
+            if(is_array($array)){
+                if(count($array) > 1){
+                    foreach($array as $key => $value){
+                        if($key === 'gte') {
+                            $where[] = $alias . '.' . $attribute .' >= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                            unset($array[$key]);
+                        }
+                        elseif($key === 'lte') {
+                            $where[] = $alias . '.' . $attribute .' <= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                            unset($array[$key]);
+                        }
+                        elseif($key === 'gt') {
+                            $where[] = $alias . '.' . $attribute .' > :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                            unset($array[$key]);
+                        }
+                        elseif($key === 'lt') {
+                            $where[] = $alias . '.' . $attribute .' < :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                            unset($array[$key]);
+                        }
                     }
-                    echo $permission->getName() . PHP_EOL;
-                    foreach ($expose as $action) {
-                        if (
-                            (
-                                $permission->getName() === str_replace('.', ':', Controller::name($class)) . ':' . str_replace('_', '.', $function) &&
-                                property_exists($action, 'role') &&
-                                $action->role === $role->getName()
-                            )
-                            ||
-                            (
-                                in_array(
-                                    $function,
-                                    ['child', 'children'],
-                                    true
-                                ) &&
-                                property_exists($action, 'role') &&
-                                $action->role === $parentRole
-                            )
-                        ) {
-                            $is_expose = true;
-                            if (
-                                property_exists($action, 'property') &&
-                                is_array($action->property)
-                            ) {
+                    if(!empty($array)){
+                        if($is_not){
+                            $where[] = $alias . '.' . $attribute . ' NOT IN (:' . $attribute . ')';
+                        } else {
+                            $where[] = $alias . '.' . $attribute . ' IN (:' . $attribute . ')';
+                        }
+                        $parameters[$attribute] = $array;
+                    }
+                } else {
+                    foreach($array as $key => $value){
+                        if(is_numeric($key)){
+                            if($value === null){
+                                $where[] = $alias . '.' . $attribute . ' IS NULL';
+                            }
+                            elseif(is_array($value)){
+                                $where[] = $alias . '.' . $attribute . ' IN (:' . $attribute . ')';
+                                $parameters[$attribute] = $value;
+                            } else {
+                                $where[] = $alias . '.' . $attribute . ' = :' . $attribute;
+                                $parameters[$attribute] = $value;
+                            }
+                        }
+                        elseif($key === 'not'){
+                            if($value === null) {
+                                $where[] = $alias . '.' . $attribute . ' IS NOT NULL';
+                            }
+                            elseif(is_array($value)){
+                                $where[] = $alias . '.' . $attribute . ' NOT IN (:' . $attribute . ')';
+                                $parameters[$attribute] = $value;
+                            } else {
+                                $where[] = $alias . '.' . $attribute . ' != :' . $attribute;
+                                $parameters[$attribute] = $value;
+                            }
+                        }
+                        elseif($key === 'exact'){
+                            if($is_not){
+                                $where[] = $alias . '.' . $attribute . ' != :' . $attribute . '_' . $key;
+                            } else {
+                                $where[] = $alias . '.' . $attribute . ' = :' . $attribute . '_' . $key;
+                            }
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'partial'){
+                            if($is_not){
+                                $where[] = $alias . '.' . $attribute .' NOT LIKE :' . $attribute . '_' . $key;
+                            } else {
+                                $where[] = $alias . '.' . $attribute .' LIKE :' . $attribute . '_' . $key;
+                            }
 
-                                foreach ($action->property as $property) {
-                                    $is_optional = false;
-                                    if(substr($property, 0, 1) === '?'){
-                                        $is_optional = true;
-                                        $property = substr($property, 1);
-                                    }
-                                    $assertion = $property;
-                                    $explode = explode(':', $property, 2);
-                                    $compare = null;
-                                    $method = 'get' . ucfirst($explode[0]);
-                                    $value = $node->{$method}();
-                                    if (array_key_exists(1, $explode)) {
-                                        $record_property = $value;
-                                        $compare = $explode[1];
-                                        $attribute = $explode[0];
-                                        if ($compare) {
-                                            $parse = new Parse($object, $object->data());
-                                            $compare = $parse->compile($compare, $object->data());
-                                            if ($record_property !== $compare) {
-                                                throw new Exception('Assertion failed: ' . $assertion . ' values [' . $record_property . ', ' . $compare . ']');
-                                            }
-                                        }
-                                    }
-                                    if (
-                                        property_exists($action, 'object') &&
-                                        property_exists($action->object, $property) &&
-                                        property_exists($action->object->$property, 'expose')
-                                    ) {
-                                        if (
-                                            property_exists($action->object->$property, 'multiple') &&
-                                            $action->object->$property->multiple === true &&
-                                            $value !== null
-                                        ) {
-                                            $array = $value;
+                            $parameters[$attribute . '_' . $key] = '%' . $value . '%';
+                        }
+                        elseif($key === 'start'){
+                            if($is_not){
+                                $where[] = $alias . '.' . $attribute .' NOT LIKE :' . $attribute . '_' . $key;
+                            } else {
+                                $where[] = $alias . '.' . $attribute . ' LIKE :' . $attribute . '_' . $key;
+                            }
+                            $parameters[$attribute . '_' . $key] = $value . '%';
+                        }
+                        elseif($key === 'end'){
+                            if($is_not){
+                                $where[] = $alias . '.' . $attribute .' NOT LIKE :' . $attribute . '_' . $key;
+                            } else {
+                                $where[] = $alias . '.' . $attribute . ' LIKE :' . $attribute . '_' . $key;
+                            }
+                            $parameters[$attribute . '_' . $key] = '%' . $value;
+                        }
+                        elseif($key === 'gte') {
+                            $where[] = $alias . '.' . $attribute .' >= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'lte') {
+                            $where[] = $alias . '.' . $attribute .' <= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'gt') {
+                            $where[] = $alias . '.' . $attribute .' > :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'lt') {
+                            $where[] = $alias . '.' . $attribute .' < :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'after'){
+                            $value = strtotime($value);
+                            $value = date('Y-m-d H:i:s', $value);
+                            $where[] = $alias . '.' . $attribute .' >= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'before'){
+                            $value = strtotime($value);
+                            $value = date('Y-m-d H:i:s', $value);
+                            $where[] = $alias . '.' . $attribute .' <= :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'strictly_after'){
+                            $value = strtotime($value);
+                            $value = date('Y-m-d H:i:s', $value);
+                            $where[] = $alias . '.' . $attribute .' > :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
 
-                                            if(is_array($array) || is_object($array)){
-                                                $record[$property] = [];
-                                                foreach ($array as $child) {
-                                                    $child = new Storage($child);
-                                                    $child_expose =[];
-                                                    if(
-                                                        property_exists($action->object->$property, 'object')
-                                                    ){
-                                                        $child_expose[] = (object) [
-                                                            'property' => $action->object->$property->expose,
-                                                            'object' => $action->object->$property->object,
-                                                            'role' => $action->role,
-                                                        ];
-                                                    }  else {
-                                                        $child_expose[] = (object) [
-                                                            'property' => $action->object->$property->expose,
-                                                            'role' => $action->role,
-                                                        ];
-                                                    }
-                                                    $child = Entity::expose(
-                                                        $object,
-                                                        $child,
-                                                        $child_expose,
-                                                        $property,
-                                                        'child',
-                                                        $role,
-                                                        $action->role
-                                                    );
-                                                    $record[$property][] = $child->data();
-                                                }
-                                            } else {
-                                                //leave intact for read without parse
-                                                $record[$property] = $array;
-                                            }
-                                        } elseif ($value !== null) {
-                                            $child = $value;
-                                            if (!empty($child)) {
-                                                $record[$property] = null;
-                                                $child = new Storage($child);
-                                                $child_expose =[];
-                                                if(
-                                                    property_exists($action->object->$property, 'objects')
-                                                ){
-                                                    $child_expose[] = (object) [
-                                                        'property' => $action->object->$property->expose,
-                                                        'object' => $action->object->$property->objects,
-                                                        'role' => $action->role,
-                                                    ];
-                                                }  else {
-                                                    $child_expose[] = (object) [
-                                                        'property' => $action->object->$property->expose,
-                                                        'role' => $action->role,
-                                                    ];
-                                                }
-                                                $child = Entity::expose(
-                                                    $object,
-                                                    $child,
-                                                    $child_expose,
-                                                    $property,
-                                                    'child',
-                                                    $role,
-                                                    $action->role
-                                                );
-                                                $record[$property] = $child->data();
-                                            }
-                                            if (empty($record[$property])) {
-                                                $record[$property] = null;
-                                            }
-                                        }
-                                    } else {
-                                        if ($value !== null) {
-                                            $record[$property] = $value;
-                                        }
-                                    }
+                        }
+                        elseif($key === 'strictly_before'){
+                            $value = strtotime($value);
+                            $value = date('Y-m-d H:i:s', $value);
+                            $where[] = $alias . '.' . $attribute .' < :' . $attribute . '_' . $key;
+                            $parameters[$attribute . '_' . $key] = $value;
+                        }
+                        elseif($key === 'between'){
+                            $value = explode('..', $value, 2);
+                            if(array_key_exists(1, $value)){
+                                if(is_numeric($value[0])){
+                                    $value[0] += 0;
                                 }
-                                if(!empty($record)){
-                                    break 3;
+                                if(is_numeric($value[1])){
+                                    $value[1] += 0;
                                 }
+                                $where[] = $alias . '.' . $attribute .' > :' . $attribute . '_' . $key . '_' . 'gt';
+                                $parameters[$attribute . '_' . $key. '_' . 'gt'] = $value[0];
+                                if(is_numeric($value)){
+                                    $value += 0;
+                                }
+                                $where[] = $alias . '.' . $attribute .' < :' . $attribute . '_' . $key . '_' . 'lt';
+                                $parameters[$attribute . '_' . $key . '_' . 'lt'] = $value[1];
+                            }
+                        }
+                        elseif($key === 'between-equals'){
+                            $value = explode('..', $value, 2);
+                            if(array_key_exists(1, $value)){
+                                if(is_numeric($value[0])){
+                                    $value[0] += 0;
+                                }
+                                if(is_numeric($value[1])){
+                                    $value[1] += 0;
+                                }
+                                $where[] = $alias . '.' . $attribute .' >= :' . $attribute . '_' . $key . '_' . 'gte';
+                                $parameters[$attribute . '_' . $key. '_' . 'gte'] = $value[0];
+                                if(is_numeric($value)){
+                                    $value += 0;
+                                }
+                                $where[] = $alias . '.' . $attribute .' <= :' . $attribute . '_' . $key . '_' . 'lte';
+                                $parameters[$attribute . '_' . $key . '_' . 'lte'] = $value[1];
                             }
                         }
                     }
                 }
+            } else {
+                $value = $array;
+                if($value === null){
+                    $where[] = $alias . '.' . $attribute . ' IS NULL';
+                }
+                elseif(is_array($value)){
+                    $where[] = $alias . '.' . $attribute . ' IN (:' . $attribute . ')';
+                    $parameters[$attribute] = $value;
+                }
+                elseif($alias) {
+                    $where[] = $alias . '.' . $attribute . ' = :' . $attribute;
+                    $parameters[$attribute] = $value;
+                }
             }
         }
-        if($is_expose === false){
-            throw new Exception('No permission found for ' . str_replace('.', ':', Controller::name($class)) . ':' . str_replace('_', '.', $function));
-        }
-        return new Storage((object) $record);
+        return $filter;
     }
 
-
-    /**
-     * @throws Exception
-     */
-    /*
-    public static function is_granted($class, $role, $options): bool
+    public static function has_set(App $object, $entity): array
     {
-        if(!array_key_exists('function', $options)){
-            throw new Exception('Function is missing in options');
-        }
-        $name = Controller::name($class);
-        $name_permission = str_replace('.', ':', $name);
-        $function_permission = str_replace('_', '.', $options['function']);
-        $role = new Data($role);
-        $is_permission = false;
-        $is_permission_relation = false;
-        $is_permission_parse = false;
-        $permissions = [];
-        $permissions[] = $name_permission . ':' . $function_permission;
-        if(
-            array_key_exists('relation', $options) &&
-            $options['relation'] === true
-        ){
-            $permissions[] = $name_permission . ':' . $function_permission . '.' . 'relation';
-        }
-        if(
-            array_key_exists('parse', $options) &&
-            $options['parse'] === true
-        ){
-            $permissions[] = $name_permission . ':' . $function_permission . '.' . 'parse';
-        }
-        $role_permissions = $role->get('permission');
-        if(is_array($role_permissions)){
-            foreach($role->get('permission') as $permission){
-                $permission = new Data($permission);
-                if($permission->get('name') === $name_permission . ':' .$function_permission){
-                    $is_permission = true;
-                }
-                if(
-                    array_key_exists('relation', $options) &&
-                    $options['relation'] === true
-                ){
-                    if($permission->get('name') === $name_permission . ':' .$function_permission . '.' . 'relation'){
-                        $is_permission_relation = true;
-                    }
-                } else {
-                    $is_permission_relation = true;
-                }
-                if(
-                    array_key_exists('parse', $options) &&
-                    $options['parse'] === true
-                ) {
-                    if($permission->get('name') === $name_permission . ':' . $function_permission . '.' . 'parse'){
-                        $is_permission_parse = true;
-                    }
-                } else {
-                    $is_permission_parse = true;
-                }
-                if(
-                    $is_permission === true &&
-                    $is_permission_parse === true &&
-                    $is_permission_relation === true
-                ){
-                    return true;
+        $entityName = $object->config('doctrine.entity.prefix') . $entity;
+        $reflection = new ReflectionObject(new $entityName());
+        $properties = $reflection->getProperties();
+        $reader = new AnnotationReader();
+        //must become attribute reader
+        $has_set = [];
+        foreach ($properties as $property) {
+            $annotations = $reader->getPropertyAnnotations($property);
+            foreach ($annotations as $annotation) {
+                if (in_array(get_class($annotation), [
+                    OneToOne::class,
+                    ManyToOne::class
+                ])) {
+                    $has_set[] = $property->getName();
                 }
             }
         }
-        throw new Exception('Security: permission denied... (' . implode(', ', $permissions) . ')');
+        return $has_set;
     }
-    */
+
+    private static function has_joins(App $object, $entity): array
+    {
+        $entityName = $object->config('doctrine.entity.prefix') . $entity;
+        $reflection = new ReflectionObject(new $entityName());
+        $properties = $reflection->getProperties();
+        $reader = new AnnotationReader();
+        //must become attribute reader
+        $has_join = [];
+        foreach ($properties as $property) {
+            $annotations = $reader->getPropertyAnnotations($property);
+            foreach ($annotations as $annotation) {
+                if (in_array(get_class($annotation), [
+                    OneToMany::class,
+                    ManyToOne::class,
+                    ManyToMany::class,
+                    OneToOne::class
+                ])) {
+                    $has_join[] = $property->getName();
+                }
+            }
+        }
+        return $has_join;
+    }
+
+    private static function get_joins(App $object, $entity): array
+    {
+        $has_join = Entity::has_joins($object, $entity);
+        $joins = [];
+        $alias = lcfirst($entity);
+        foreach($object->request() as $attribute => $value){
+            if(in_array($attribute, $has_join)){
+                $joins[] = [
+                    'join' => $alias . '.' . $attribute,
+                    'alias' => $attribute
+                ];
+            }
+            elseif(substr($attribute, 0, 1) === '@'){
+                $joins[] = [
+                    'join' => $alias . '.' . substr($attribute, 1),
+                    'alias' => substr($attribute, 1)
+                ];
+            }
+        }
+        return $joins;
+    }
+
+    private static function import($node, $data=[]){
+        foreach($data as $key => $value){
+            if($key === 'request'){
+                continue;
+            }
+            if(
+                in_array(
+                    substr($key, 0, 5),
+                    [
+                        'node_',
+                        'node.'
+                    ]
+                )
+            ){
+                $explode = explode('_', substr($key, 5));
+                foreach($explode as $nr => $part){
+                    $explode[$nr] = ucfirst($part);
+                }
+                $method = 'set' . implode($explode);
+                if(method_exists($node, $method)){
+                    $node->$method($value);
+                }
+            } else {
+                $explode = explode('_', $key);
+                foreach($explode as $nr => $part){
+                    $explode[$nr] = ucfirst($part);
+                }
+                $method = 'set' . implode($explode);
+                if(method_exists($node, $method)){
+                    $node->$method($value);
+                }
+            }
+        }
+        return $node;
+    }
+
+    public static function getValidatorUrl(App $object, $entity): string
+    {
+        return $object->config('project.dir.source') .
+            'Validate' .
+            $object->config('ds') .
+            $entity .
+            $object->config('extension.json');
+    }
 }
