@@ -73,25 +73,7 @@ class Entity extends Main
                     );
                     $entityManager->persist($node);
                     $entityManager->flush();
-
-                    ddd($node);
-
-                    $toArray = Entity::expose_get(
-                        $object,
-                        $entity,
-                        $entity . '.' . $function . '.output'
-                    );
-                    $record = [];
-                    $record = Entity::expose(
-                        $object,
-                        $node,
-                        $toArray,
-                        $entity,
-                        $function,
-                        $record
-                    );
-                    ddd($record);
-                    $data['node'] = $record;
+                    $data['node'] = $node;
                 } else {
                     $data['error'] = $validate->test;
                 }
