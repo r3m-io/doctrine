@@ -77,10 +77,15 @@ trait Main {
         $url_bin = $object->config('project.dir.vendor') . 'r3m_io/doctrine/src/Bin/Doctrine.php';
         $url_target = $object->config('project.dir.binary') . 'Doctrine.php';
         File::copy($url_bin, $url_target);
-        $url_bin = $object->config('project.dir.vendor') . 'r3m_io/doctrine/src/Bin/doctrine';
-        $url_target = '/usr/bin/doctrine';
-        File::copy($url_bin, $url_target);
-        $command = 'chmod +x ' . $url_target;
+        $url_bin_source = $object->config('project.dir.vendor') . 'r3m_io/doctrine/src/Bin/doctrine';
+        $url_bin_target = '/usr/bin/doctrine';
+        File::copy($url_bin_source, $url_bin_target);
+        $command = 'chmod +x ' . $url_bin_target;
         exec($command);
+        File::permission($object, [
+            'url_target' => $url_target,
+            'url_bin_target' => $url_bin_target,
+        ]);
+
     }
 }
