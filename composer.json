@@ -10,7 +10,8 @@
         "ext-iconv": "*",
         "ext-pdo": "*",
         "r3m_io/framework": "dev-main",
-        "doctrine/orm": "3.0.1"
+        "doctrine/orm": "3.0.1",
+        "symfony/cache": "*"
     },
     "minimum-stability": "dev",
     "license" : "MIT",
