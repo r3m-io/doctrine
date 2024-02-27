@@ -960,7 +960,7 @@ class Entity extends Main
      * @throws Exception
      * @throws AuthorizationException
      */
-    public static function expose(App $object, $node, $toArray=[], $entity='', $function='', $record=[], $internalRole=false, $parentScope=false): array
+    public static function expose(App $object, $node, $toArray=[], $entity='', $function='', $record=[], $internalRole=false, $parentRole=false): array
     {
         if(!is_array($toArray)){
             return $record;
@@ -976,56 +976,34 @@ class Entity extends Main
         }
         if($internalRole){
             $roles[] = $internalRole; //same as parent
-        } else {
-            $roles = Permission::getAccessControl($object, $entity, $function);
-            try {
-                $user = User::getByAuthorization($object);
-                if($user){
-                    $roles = $user->getRolesByRank('asc');
-                }
-            } catch (Exception $exception){
-
-            }
         }
         if(empty($roles)){
             throw new Exception('Roles failed...');
         }
-        if(is_array($entity)){
-            ddd($entity);
-        }
-        if(is_array($function)){
-            $debug = debug_backtrace(true);
-            ddd($debug[0]);
-            ddd($function);
-
-        }
         foreach($roles as $role){
             $permissions = $role->getPermissions();
             foreach ($permissions as $permission){
-                if(is_array($permission)){
-                    ddd($permission);
-                }
                 foreach($toArray as $action) {
                     if(
                         (
-                            $permission->getName() === $entity . '.' . $function &&
-                            property_exists($action, 'scope') &&
-                            $action->scope === $permission->getScope()
+                            $permission->getName() === $entity . ':' . $function &&
+                            property_exists($action, 'role') &&
+                            $action->role === $role->getName()
                         ) ||
                         (
                             in_array(
                                 $function,
                                 ['child', 'children']
                             ) &&
-                            property_exists($action, 'scope') &&
-                            $action->scope === $parentScope
+                            property_exists($action, 'role') &&
+                            $action->role === $parentRole
                         )
                     ) {
                         if (
-                            property_exists($action, 'attributes') &&
-                            is_array($action->attributes)
+                            property_exists($action, 'property') &&
+                            is_array($action->property)
                         ) {
-                            foreach ($action->attributes as $attribute) {
+                            foreach ($action->property as $attribute) {
                                 $assertion = $attribute;
                                 $explode = explode(':', $attribute, 2);
                                 $compare = null;
@@ -1074,7 +1052,7 @@ class Entity extends Main
                                                 'children',
                                                 $child_record,
                                                 $role,
-                                                $action->scope
+                                                $role->getName()
                                             );
                                             $record[$attribute][] = $child_record;
                                         }
