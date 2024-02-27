@@ -129,40 +129,15 @@ class Entity extends Main
         throw new Exception('Cannot find entity: ' . $entity .', with uuid: ' . $uuid);
     }
 
-    /**
-     * @throws ObjectException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws ORMException
-     * @throws AuthorizationException
-     * @throws FileWriteException
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public static function readById(App $object, $entity, $id): array
+    public static function readById(App $object, EntityManager $entityManager, $entity, $id): array
     {
-        $function = 'read';
-        Permission::request($object, $entity, $function);
-        $entityManager = Database::entityManager($object, ['name' => Main::API]);
         $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
         $node = $repository->findOneBy([
             'id' => $id
         ]);
         if($node) {
             $data = [];
-            $record = [];
-            $toArray = Entity::expose_get(
-                $object,
-                $entity,
-                $entity . '.' . $function . '.expose'
-            );
-            $record = Entity::expose(
-                $object,
-                $node,
-                $toArray,
-                $entity,
-                $function,
-                $record
-            );
-            $data['node'] = $record;
+            $data['node'] = $node;
             return $data;
         }
         throw new Exception('Cannot find entity: ' . $entity .', with id: ' . $id);
