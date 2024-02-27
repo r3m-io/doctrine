@@ -84,7 +84,6 @@ trait Main {
         exec($command);
         File::permission($object, [
             'url_target' => $url_target,
-            'url_bin_target' => $url_bin_target,
         ]);
 
     }
