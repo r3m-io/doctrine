@@ -52,7 +52,6 @@ class Entity extends Main
         if(empty($request)){
             throw new Exception('Request is empty...');
         }
-        $entityManager = Database::entityManager($object, ['name' => Main::API]);
         $validate_url = Entity::getValidatorUrl($object, $entity);
         if(File::exist($validate_url)){
             $validate = Main::validate($object, $validate_url,  $entity . '.create');
@@ -71,8 +70,14 @@ class Entity extends Main
                         $class,
                         $request
                     );
-                    $entityManager->persist($node);
-                    $entityManager->flush();
+                    try {
+                        $entityManager->persist($node);
+                        $entityManager->flush();
+                    }
+                    catch(Exception $exception){
+                        throw new Exception('Cannot create entity: ' . $entity . ', error: ' . $exception->getMessage());
+                    }
+
                     $data['node'] = $node;
                 } else {
                     $data['error'] = $validate->test;
