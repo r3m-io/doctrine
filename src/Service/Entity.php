@@ -3,6 +3,7 @@ namespace R3m\Io\Doctrine\Service;
 
 
 use DateTime;
+use Doctrine\ORM\Exception\NotSupported;
 use ReflectionObject;
 
 use Doctrine\ORM\EntityManager;
@@ -129,6 +130,10 @@ class Entity extends Main
         throw new Exception('Cannot find entity: ' . $entity .', with uuid: ' . $uuid);
     }
 
+    /**
+     * @throws NotSupported
+     * @throws Exception
+     */
     public static function readById(App $object, EntityManager $entityManager, $entity, $id): array
     {
         $repository = $entityManager->getRepository($object->config('doctrine.entity.prefix') . $entity);
