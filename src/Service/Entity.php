@@ -78,7 +78,6 @@ class Entity extends Main
                         $entity,
                         $entity . '.' . $function . '.output'
                     );
-                    ddd($toArray);
                     $record = [];
                     $record = Entity::expose(
                         $object,
@@ -88,6 +87,7 @@ class Entity extends Main
                         $function,
                         $record
                     );
+                    ddd($record);
                     $data['node'] = $record;
                 } else {
                     $data['error'] = $validate->test;
