@@ -10,10 +10,7 @@
         "ext-iconv": "*",
         "ext-pdo": "*",
         "r3m_io/framework": "dev-main",
-        "doctrine/orm": "^2.8",
-        "doctrine/doctrine-bundle": "^2.4",
-        "doctrine/annotations": "^1.13",
-        "doctrine/persistence": "^2.2"
+        "doctrine/orm": "3.0.1"
     },
     "minimum-stability": "dev",
     "license" : "MIT",
