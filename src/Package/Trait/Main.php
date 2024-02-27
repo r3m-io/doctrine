@@ -3,6 +3,7 @@ namespace Package\R3m\Io\Doctrine\Trait;
 
 use R3m\Io\Config;
 
+use R3m\Io\Module\File;
 use R3m\Io\Node\Model\Node;
 
 use Exception;
@@ -56,6 +57,9 @@ trait Main {
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function bin_doctrine($options=[]){
         $object = $this->object();
         $posix_id = $object->config(Config::POSIX_ID);
@@ -70,7 +74,13 @@ trait Main {
         ){
             throw new Exception('Access denied...');
         }
-        dump($object->config('controller.dir'));
-        ddd($object->config('project.dir'));
+        $url_bin = $object->config('project.dir.vendor') . 'r3m_io/doctrine/src/Bin/Doctrine.php';
+        $url_target = $object->config('project.dir.binary') . 'Doctrine.php';
+        File::copy($url_bin, $url_target);
+        $url_bin = $object->config('project.dir.vendor') . 'r3m_io/doctrine/src/Bin/doctrine';
+        $url_target = '/usr/bin/doctrine';
+        File::copy($url_bin, $url_target);
+        $command = 'chmod +x ' . $url_target;
+        exec($command);
     }
 }
