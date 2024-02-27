@@ -960,7 +960,7 @@ class Entity extends Main
      * @throws Exception
      * @throws AuthorizationException
      */
-    public static function expose(App $object, $node, $toArray=[], $entity='', $function='', $record=[], $internalRole=false, $parentRole=false): array
+    public static function output(App $object, $node, $toArray=[], $entity='', $function='', $record=[], $internalRole=false): array
     {
         if(!is_array($toArray)){
             return $record;
@@ -996,7 +996,7 @@ class Entity extends Main
                                 ['child', 'children']
                             ) &&
                             property_exists($action, 'role') &&
-                            $action->role === $parentRole
+                            $action->role === $role->getName()
                         )
                     ) {
                         if (
@@ -1030,13 +1030,13 @@ class Entity extends Main
                                     $method = 'get' . implode($methods);
                                 }
                                 if (
-                                    property_exists($action, 'objects') &&
-                                    property_exists($action->objects, $attribute) &&
-                                    property_exists($action->objects->$attribute, 'expose')
+                                    property_exists($action, 'object') &&
+                                    property_exists($action->object, $attribute) &&
+                                    property_exists($action->object->$attribute, 'output')
                                 ) {
                                     if (
-                                        property_exists($action->objects->$attribute, 'multiple') &&
-                                        $action->objects->$attribute->multiple === true &&
+                                        property_exists($action->object->$attribute, 'multiple') &&
+                                        $action->object->$attribute->multiple === true &&
                                         method_exists($node, $method)
                                     ) {
                                         $record[$attribute] = [];
@@ -1044,15 +1044,14 @@ class Entity extends Main
                                         foreach ($array as $child) {
                                             $child_entity = explode('Entity\\', get_class($child));
                                             $child_record = [];
-                                            $child_record = Entity::expose(
+                                            $child_record = Entity::output(
                                                 $object,
                                                 $child,
-                                                $action->objects->$attribute->expose,
+                                                $action->object->$attribute->output,
                                                 $child_entity[1],
                                                 'children',
                                                 $child_record,
                                                 $role,
-                                                $role->getName()
                                             );
                                             $record[$attribute][] = $child_record;
                                         }
@@ -1063,15 +1062,14 @@ class Entity extends Main
                                         $child = $node->$method();
                                         if (!empty($child)) {
                                             $child_entity = explode('Entity\\', get_class($child));
-                                            $record[$attribute] = Entity::expose(
+                                            $record[$attribute] = Entity::output(
                                                 $object,
                                                 $child,
-                                                $action->objects->$attribute->expose,
+                                                $action->object->$attribute->output,
                                                 $child_entity[1],
                                                 'child',
                                                 $record[$attribute],
                                                 $role,
-                                                $action->scope
                                             );
                                         }
                                         if (empty($record[$attribute])) {
