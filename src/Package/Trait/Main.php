@@ -25,7 +25,8 @@ trait Main {
                 [
                     0,
                     33
-                ]
+                ],
+                true
             )
         ){
             throw new Exception('Access denied...');
@@ -53,5 +54,23 @@ trait Main {
                 throw new Exception('Could not patch node System.Config');
             }
         }
+    }
+
+    public function bin_doctrine($options=[]){
+        $object = $this->object();
+        $posix_id = $object->config(Config::POSIX_ID);
+        if(
+            !in_array(
+                $posix_id,
+                [
+                    0,
+                ],
+                true
+            )
+        ){
+            throw new Exception('Access denied...');
+        }
+        dump($object->config('controller.dir'));
+        ddd($object->config('project.dir'));
     }
 }
