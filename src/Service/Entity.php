@@ -34,6 +34,7 @@ use Doctrine\ORM\Query\QueryException;
 use R3m\Io\Exception\AuthorizationException;
 use R3m\Io\Exception\ObjectException;
 use R3m\Io\Exception\FileWriteException;
+use Repository\PermissionRepository;
 
 
 class Entity extends Main
