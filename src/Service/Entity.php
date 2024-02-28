@@ -1306,13 +1306,13 @@ class Entity extends Main
         $entityName = $object->config('doctrine.entity.prefix') . $entity;
         $reflection = new ReflectionObject(new $entityName());
         $properties = $reflection->getProperties();
-        $reader = new AnnotationReader();
+        $reader = new AttributeReader();
         //must become attribute reader
         $has_set = [];
         foreach ($properties as $property) {
-            $annotations = $reader->getPropertyAnnotations($property);
-            foreach ($annotations as $annotation) {
-                if (in_array(get_class($annotation), [
+            $attributes = $reader->getPropertyAttributes($property);
+            foreach ($attributes as $attribute) {
+                if (in_array(get_class($attribute), [
                     OneToOne::class,
                     ManyToOne::class
                 ])) {
@@ -1408,6 +1408,9 @@ class Entity extends Main
         return $node;
     }
 
+    /**
+     * @throws Exception
+     */
     public static function getValidatorUrl(App $object, $entity): string
     {
         return $object->config('project.dir.source') .
