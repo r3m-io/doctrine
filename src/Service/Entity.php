@@ -1330,8 +1330,8 @@ class Entity extends Main
         $has_join = [];
         foreach ($properties as $property) {
             $attributes = $reader->getPropertyAttributes($property);
-            foreach ($attributes as $annotation) {
-                if (in_array(get_class($attributes), [
+            foreach ($attributes as $attribute) {
+                if (in_array(get_class($attribute), [
                     OneToMany::class,
                     ManyToOne::class,
                     ManyToMany::class,
