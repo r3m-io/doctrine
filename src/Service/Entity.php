@@ -634,9 +634,14 @@ class Entity extends Main
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public static function list(App $object, EntityManager $entityManager, $entity): array
+    public static function list(App $object, EntityManager $entityManager, $entity, $options=[]): array
     {
-        $function = __FUNCTION__;
+        if(!array_key_exists('function', $options)){
+            $options['function'] = __FUNCTION__;
+        }
+        if(!array_key_exists('fetchJoinCollection', $options)){
+            $options['fetchJoinCollection'] = true;
+        }
         $pagination = $object->request('pagination');
         $filter = Entity::filter($object, $where, $parameters);
         $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
@@ -696,7 +701,7 @@ class Entity extends Main
             $toArray = Entity::expose_get(
                 $object,
                 $entity,
-                $entity . '.' . $function .'.output'
+                $entity . '.' . $options['function'] .'.output'
             );
             foreach($result as $node){
                 $record = [];
@@ -705,7 +710,7 @@ class Entity extends Main
                     $node,
                     $toArray,
                     $entity,
-                    $function,
+                    $options['function'],
                     $record
                 );
                 $data['nodeList'][] = $record;
@@ -786,20 +791,20 @@ class Entity extends Main
             $qb->setParameters($parameters)
                 ->setFirstResult($firstResult)
                 ->setMaxResults($limit);
-            $paginator = new Paginator($qb->getQuery(), $fetchJoinCollection);
-            $toArray = Entity::expose_get(
+            $paginator = new Paginator($qb->getQuery(), $options['fetchJoinCollection']);
+            $expose = Entity::expose_get(
                 $object,
                 $entity,
-                $entity . '.list.expose'
+                $entity . '.'. $options['function'] . '.output'
             );
             foreach ($paginator as $node) {
                 $record = [];
-                $record = Entity::expose(
+                $record = Entity::output(
                     $object,
                     $node,
-                    $toArray,
+                    $expose,
                     $entity,
-                    $function,
+                    $options['function'],
                     $record
                 );
                 $data['nodeList'][] = $record;
