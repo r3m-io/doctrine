@@ -759,7 +759,6 @@ class Entity extends Main
                 }
             }
             $qb->setParameters($parameters);
-            ddd($qb->getQuery());
             $count = $qb
                 ->getQuery()
                 ->getSingleScalarResult();
