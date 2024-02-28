@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Mapping\Driver\AttributeReader;
+use Doctrine\ORM\Query\Parameter;
 use ReflectionObject;
 
 use Doctrine\ORM\EntityManager;
@@ -1293,7 +1294,9 @@ class Entity extends Main
                 }
             }
         }
-        ddd($parameters);
+        foreach($parameters as $key => $parameter){
+            $parameters[$key] = new Parameter($key, $parameter);
+        }
         $parameters = new ArrayCollection($parameters);
         return $filter;
     }
