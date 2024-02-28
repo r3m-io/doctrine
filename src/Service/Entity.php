@@ -5,6 +5,7 @@ namespace R3m\Io\Doctrine\Service;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\NotSupported;
+use Doctrine\ORM\Mapping\Driver\AttributeReader;
 use ReflectionObject;
 
 use Doctrine\ORM\EntityManager;
@@ -634,9 +635,9 @@ class Entity extends Main
      */
     public static function list(App $object, EntityManager $entityManager, $entity): array
     {
+        $function = __FUNCTION__;
         $pagination = $object->request('pagination');
         $filter = Entity::filter($object, $where, $parameters);
-        ddd($parameters);
         $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
         $alias = lcfirst($entity);
         $data = [];
@@ -694,11 +695,11 @@ class Entity extends Main
             $toArray = Entity::expose_get(
                 $object,
                 $entity,
-                $entity . '.' . $function .'.expose'
+                $entity . '.' . $function .'.output'
             );
             foreach($result as $node){
                 $record = [];
-                $record = Entity::expose(
+                $record = Entity::output(
                     $object,
                     $node,
                     $toArray,
@@ -717,6 +718,7 @@ class Entity extends Main
                 $page = 1;
             }
             $limit = Limit::LIMIT;
+            /*
             $settings_url = $object->config('controller.dir.data') . 'Settings' . $object->config('extension.json');
             $settings =  $object->data_read($settings_url);
             if($settings){
@@ -724,6 +726,7 @@ class Entity extends Main
                     $limit = $settings->data('component.default.limit');
                 }
             }
+            */
             if($object->request('limit')){
                 $limit = (int) $object->request('limit');
                 if($limit > Limit::MAX){
@@ -1319,11 +1322,11 @@ class Entity extends Main
         $entityName = $object->config('doctrine.entity.prefix') . $entity;
         $reflection = new ReflectionObject(new $entityName());
         $properties = $reflection->getProperties();
-        $reader = new AnnotationReader();
+        $reader = new AttributeReader();
         //must become attribute reader
         $has_join = [];
         foreach ($properties as $property) {
-            $annotations = $reader->getPropertyAnnotations($property);
+            $annotations = $reader->getPropertyAttribute($property);
             foreach ($annotations as $annotation) {
                 if (in_array(get_class($annotation), [
                     OneToMany::class,
@@ -1344,7 +1347,7 @@ class Entity extends Main
         $joins = [];
         $alias = lcfirst($entity);
         foreach($object->request() as $attribute => $value){
-            if(in_array($attribute, $has_join)){
+            if(in_array($attribute, $has_join, true)){
                 $joins[] = [
                     'join' => $alias . '.' . $attribute,
                     'alias' => $attribute
