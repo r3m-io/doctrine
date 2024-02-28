@@ -1317,6 +1317,9 @@ class Entity extends Main
         return $has_set;
     }
 
+    /**
+     * @throws Exception
+     */
     private static function has_joins(App $object, $entity): array
     {
         $entityName = $object->config('doctrine.entity.prefix') . $entity;
@@ -1326,9 +1329,9 @@ class Entity extends Main
         //must become attribute reader
         $has_join = [];
         foreach ($properties as $property) {
-            $annotations = $reader->getPropertyAttribute($property);
-            foreach ($annotations as $annotation) {
-                if (in_array(get_class($annotation), [
+            $attributes = $reader->getPropertyAttributes($property);
+            foreach ($attributes as $annotation) {
+                if (in_array(get_class($attributes), [
                     OneToMany::class,
                     ManyToOne::class,
                     ManyToMany::class,
