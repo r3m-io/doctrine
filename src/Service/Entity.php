@@ -964,7 +964,6 @@ class Entity extends Main
         foreach($roles as $role){
             $permissions = $role->getPermissions();
             foreach ($permissions as $permission){
-                d($permission->getName());
                 foreach($toArray as $action) {
                     if(
                         (
