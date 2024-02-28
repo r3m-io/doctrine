@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Mapping\Driver\AttributeReader;
 use Doctrine\ORM\Query\Parameter;
+use Entity\Role;
 use ReflectionObject;
 
 use Doctrine\ORM\EntityManager;
@@ -51,7 +52,7 @@ class Entity extends Main
      * @throws AuthorizationException
      * @throws FileWriteException
      */
-    public static function create(App $object, EntityManager $entityManager, $entity=null, $request=[]): array
+    public static function create(App $object, EntityManager $entityManager, Role $role, $entity=null, $request=[]): array
     {
         $function = __FUNCTION__;
         if(empty($request)){
@@ -634,7 +635,7 @@ class Entity extends Main
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public static function list(App $object, EntityManager $entityManager, $entity, $options=[]): array
+    public static function list(App $object, EntityManager $entityManager, Role $role, $entity, $options=[]): array
     {
         if(!array_key_exists('function', $options)){
             $options['function'] = __FUNCTION__;
@@ -711,7 +712,8 @@ class Entity extends Main
                     $toArray,
                     $entity,
                     $options['function'],
-                    $record
+                    $record,
+                    $role
                 );
                 $data['nodeList'][] = $record;
             }
@@ -805,7 +807,8 @@ class Entity extends Main
                     $expose,
                     $entity,
                     $options['function'],
-                    $record
+                    $record,
+                    $role
                 );
                 $data['nodeList'][] = $record;
             }
