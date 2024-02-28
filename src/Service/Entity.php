@@ -638,6 +638,7 @@ class Entity extends Main
         $function = __FUNCTION__;
         $pagination = $object->request('pagination');
         $filter = Entity::filter($object, $where, $parameters);
+        ddd($parameters);
         $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
         $alias = lcfirst($entity);
         $data = [];
@@ -1292,6 +1293,7 @@ class Entity extends Main
                 }
             }
         }
+        ddd($parameters);
         $parameters = new ArrayCollection($parameters);
         return $filter;
     }
