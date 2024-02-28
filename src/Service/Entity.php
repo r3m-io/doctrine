@@ -1075,7 +1075,7 @@ class Entity extends Main
      * @throws ObjectException
      * @throws \ReflectionException
      */
-    private static function filter(App $object, &$where=[], ArrayCollection &$parameters){
+    private static function filter(App $object, &$where=[], ArrayCollection &$parameters=null){
         $request = clone $object->request();
         unset($request->limit);
         unset($request->pagination);
