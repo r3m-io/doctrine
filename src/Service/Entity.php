@@ -3,6 +3,7 @@ namespace R3m\Io\Doctrine\Service;
 
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Exception\NotSupported;
 use ReflectionObject;
 
@@ -631,11 +632,8 @@ class Entity extends Main
      * @throws NonUniqueResultException
      * @throws Exception
      */
-    public static function list(App $object, $entity): array
+    public static function list(App $object, EntityManager $entityManager, $entity): array
     {
-        $function = __function__;
-        $request = Permission::request($object, $entity, $function, $user, $fetchJoinCollection);
-        $entityManager = Database::entityManager($object, ['name' => Main::API]);
         $pagination = $object->request('pagination');
         $filter = Entity::filter($object, $where, $parameters);
         $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
@@ -1289,6 +1287,7 @@ class Entity extends Main
                 }
             }
         }
+        $parameters = new ArrayCollection($parameters);
         return $filter;
     }
 
