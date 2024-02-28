@@ -636,6 +636,7 @@ class Entity extends Main
     {
         $pagination = $object->request('pagination');
         $filter = Entity::filter($object, $where, $parameters);
+        ddd($parameters);
         $order = Core::object($object->request('order'), Core::OBJECT_ARRAY);
         $alias = lcfirst($entity);
         $data = [];
@@ -1074,7 +1075,7 @@ class Entity extends Main
      * @throws ObjectException
      * @throws \ReflectionException
      */
-    private static function filter(App $object, &$where=[], &$parameters=[]){
+    private static function filter(App $object, &$where=[], ArrayCollection &$parameters){
         $request = clone $object->request();
         unset($request->limit);
         unset($request->pagination);
