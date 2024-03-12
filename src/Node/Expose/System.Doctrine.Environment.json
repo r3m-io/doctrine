@@ -3,7 +3,7 @@
         "Doctrine": {
             "Environment": {
                 "count": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -23,7 +23,7 @@
                     ]
                 },
                 "create": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -43,7 +43,7 @@
                     ]
                 },
                 "list": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -63,7 +63,7 @@
                     ]
                 },
                 "page": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -83,7 +83,7 @@
                     ]
                 },
                 "patch": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -103,7 +103,7 @@
                     ]
                 },
                 "put": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -123,7 +123,7 @@
                     ]
                 },
                 "read": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [
@@ -143,7 +143,7 @@
                     ]
                 },
                 "record": {
-                    "expose": [
+                    "output": [
                         {
                             "role": "ROLE_SYSTEM",
                             "property": [

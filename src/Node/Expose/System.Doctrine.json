@@ -2,7 +2,7 @@
     "System": {
         "Doctrine": {
             "count": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -16,13 +16,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -31,7 +31,7 @@
                 ]
             },
             "create": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -45,13 +45,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -60,7 +60,7 @@
                 ]
             },
             "list": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -74,13 +74,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -89,7 +89,7 @@
                 ]
             },
             "page": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -103,13 +103,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -118,7 +118,7 @@
                 ]
             },
             "patch": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -132,13 +132,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -147,7 +147,7 @@
                 ]
             },
             "put": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -161,13 +161,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -176,7 +176,7 @@
                 ]
             },
             "read": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -190,13 +190,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
@@ -205,7 +205,7 @@
                 ]
             },
             "record": {
-                "expose": [
+                "output": [
                     {
                         "role": "ROLE_SYSTEM",
                         "property": [
@@ -219,13 +219,13 @@
                         "object": {
                             "proxy": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "dir"
                                 ]
                             },
                             "entity": {
                                 "multiple": false,
-                                "expose": [
+                                "output": [
                                     "prefix"
                                 ]
                             }
