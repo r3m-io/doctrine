@@ -9,11 +9,10 @@
         "ext-zlib": "*",
         "ext-iconv": "*",
         "ext-pdo": "*",
-        "r3m_io/framework": "dev-main",
+        "r3m_io/framework": ">=2024.04.26",
         "doctrine/orm": "3.0.1",
         "symfony/cache": "*"
     },
-    "minimum-stability": "dev",
     "license" : "MIT",
     "authors" : [{
         "name" : "Remco van der Velde",
