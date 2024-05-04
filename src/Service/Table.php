@@ -69,9 +69,9 @@ class Table extends Main
                     property_exists($column, 'options')
                 ){
                     $schema_options = (array) $column->options;
-                    if(array_key_exists('nullable', $options)){
-                        $options['notnull'] = !$options['nullable'];
-                        unset($options['nullable']);
+                    if(array_key_exists('nullable', $schema_options)){
+                        $schema_options['notnull'] = !$schema_options['nullable'];
+                        unset($schema_options['nullable']);
                     }
                     $schema_table->addColumn($column_name, $column->type, $schema_options);
                 }
