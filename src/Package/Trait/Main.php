@@ -1,6 +1,8 @@
 <?php
 namespace Package\R3m\Io\Doctrine\Trait;
 
+use Doctrine\DBAL\Schema\Schema;
+
 use R3m\Io\Config;
 
 use R3m\Io\Module\File;
@@ -85,6 +87,5 @@ trait Main {
         File::permission($object, [
             'url_target' => $url_target,
         ]);
-
     }
 }
