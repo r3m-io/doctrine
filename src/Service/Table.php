@@ -73,7 +73,11 @@ class Table extends Main
                         $schema_options['notnull'] = !$schema_options['nullable'];
                         unset($schema_options['nullable']);
                     }
-                    $schema_table->addColumn($column_name, $column->type, $schema_options);
+                    if(!empty($schema_options)){
+                        $schema_table->addColumn($column_name, $column->type, $schema_options);
+                    } else {
+                        $schema_table->addColumn($column_name, $column->type);
+                    }
                 }
             }
             if($read->has('Schema.primary_key')){
