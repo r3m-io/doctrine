@@ -64,17 +64,16 @@ class Table extends Main
             $schema_table = $schema->createTable($read->get('Schema.table'));
             $columns = $read->get('Schema.columns');
             foreach($columns as $column_name => $column){
-                if(
-                    property_exists($column, 'type') &&
-                    property_exists($column, 'options')
-                ){
-                    $schema_options = (array) $column->options;
-                    if(array_key_exists('nullable', $schema_options)){
-                        $schema_options['notnull'] = !$schema_options['nullable'];
-                        unset($schema_options['nullable']);
-                    }
-                    if(!empty($schema_options)){
-                        $schema_table->addColumn($column_name, $column->type, $schema_options);
+                if(property_exists($column, 'type')){
+                    if(property_exists($column, 'options')){
+                        $schema_options = (array) $column->options;
+                        if(array_key_exists('nullable', $schema_options)){
+                            $schema_options['notnull'] = !$schema_options['nullable'];
+                            unset($schema_options['nullable']);
+                        }
+                        if(!empty($schema_options)) {
+                            $schema_table->addColumn($column_name, $column->type, $schema_options);
+                        }
                     } else {
                         $schema_table->addColumn($column_name, $column->type);
                     }
