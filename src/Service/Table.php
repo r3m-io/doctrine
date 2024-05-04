@@ -82,8 +82,8 @@ class Table extends Main
             if($read->has('Schema.primary_key')){
                 $schema_table->setPrimaryKey($read->get('Schema.primary_key'));
             }
-            if($read->has('Schema.index_unique')){
-                foreach($read->get('Schema.index_unique') as $index){
+            if($read->has('Schema.unique')){
+                foreach($read->get('Schema.unique') as $index){
                     if(is_array($index)){
                         $schema_table->addUniqueIndex($index);
                     } else {
