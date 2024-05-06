@@ -87,42 +87,42 @@ class Schema extends Main
                         $both = $column->name;
                         */
                         if(
-                            property_exists('options', $column) &&
-                            property_exists('id', $column->options) &&
+                            property_exists($column, 'options') &&
+                            property_exists($column->options, 'id') &&
                             $column->options->id === true
                         ){
                             $data[] = '#[ORM\Id]';
                         }
                         if(
-                            property_exists('type', $column)
+                            property_exists($column, 'type')
                         ){
                             $column_value = 'type: ' . $column->type;
                             $column_value .= ', name: "`' . $column->name . '`"';
                             if(
-                                property_exists('options', $column) &&
-                                property_exists('unique', $column->options) &&
+                                property_exists($column,'options') &&
+                                property_exists($column->options, 'unique') &&
                                 $column->options->unique === true
                             ){
                                 $column_value .= ', unique: true';
                             }
                             if(
-                                property_exists('options', $column) &&
-                                property_exists('nullable', $column->options) &&
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'nullable') &&
                                 $column->options->nullable === true
                             ){
                                 $column_value .= ', nullable: true';
                             }
                             if(
-                                property_exists('options', $column) &&
-                                property_exists('default', $column->options)
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'default')
                             ){
                                 $column_value .= ', options: ["default": "' . $column->options->default . '"]';
                             }
                             $data[] = '#[ORM\column(' . $column-$column_value . ')]';
                         }
                         if(
-                            property_exists('options', $column) &&
-                            property_exists('autoincrement', $column->options) &&
+                            property_exists($column, 'options') &&
+                            property_exists($column->options, 'autoincrement') &&
                             $column->options->autoincrement === true
                         ){
                             $data[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
