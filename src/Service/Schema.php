@@ -116,7 +116,9 @@ class Schema extends Main
                                 property_exists($column, 'options') &&
                                 property_exists($column->options, 'default')
                             ){
-                                $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                                if(!$column->options->default === null){
+                                    $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                                }
                             }
                             $data[] = '#[ORM\column(' . $column_value . ')]';
                         }
