@@ -81,7 +81,52 @@ class Schema extends Main
                 $columns = $read->get('Schema.columns');
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
-                        ddd($column);
+                        /*
+                        $get = 'get' . ucfirst($column->name);
+                        $set = 'set' . ucfirst($column->name);
+                        $both = $column->name;
+                        */
+                        if(
+                            property_exists('options', $column) &&
+                            property_exists('id', $column->options) &&
+                            $column->options->id === true
+                        ){
+                            $data[] = '#[ORM\Id]';
+                        }
+                        if(
+                            property_exists('type', $column)
+                        ){
+                            $column_value = 'type: ' . $column->type;
+                            $column_value .= ', name: "`' . $column->name . '`"';
+                            if(
+                                property_exists('options', $column) &&
+                                property_exists('unique', $column->options) &&
+                                $column->options->unique === true
+                            ){
+                                $column_value .= ', unique: true';
+                            }
+                            if(
+                                property_exists('options', $column) &&
+                                property_exists('nullable', $column->options) &&
+                                $column->options->nullable === true
+                            ){
+                                $column_value .= ', nullable: true';
+                            }
+                            if(
+                                property_exists('options', $column) &&
+                                property_exists('default', $column->options)
+                            ){
+                                $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                            }
+                            $data[] = '#[ORM\column(' . $column-$column_value . ')]';
+                        }
+                        if(
+                            property_exists('options', $column) &&
+                            property_exists('autoincrement', $column->options) &&
+                            $column->options->autoincrement === true
+                        ){
+                            $data[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
+                        }
                     }
                 }
 
