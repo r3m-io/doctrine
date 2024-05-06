@@ -129,6 +129,7 @@ class Schema extends Main
                         ){
                             $data[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
                         }
+                        $data[] = 'protected $' . $column->name . ';';
                     }
                 }
 
