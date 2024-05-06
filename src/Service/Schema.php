@@ -22,6 +22,7 @@ class Schema extends Main
         if(!property_exists($options, 'url')){
             throw new Exception('Option, Url not set...');
         }
+        d($options->url);
         $read = $object->data_read($options->url);
         if($read){
             $has_schema = $read->has('Schema');
