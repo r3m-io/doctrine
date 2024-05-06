@@ -71,6 +71,13 @@ class Schema extends Main
                         $data[] = 'use ' . $usage . ';';
                     }
                 }
+                $data[] = '';
+                $data[] = '#[ORM\Entity]';
+                $data[] = '#[ORM\Table(name: "' . $table . '")]';
+                $data[] = '#[ORM\HasLifecycleCallbacks]';
+                $data[] = 'class ' . $entity . ' {';
+                $data[] = '';
+                $data[] = '}';
                 ddd($data);
             }
         }
