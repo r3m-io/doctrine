@@ -77,6 +77,15 @@ class Schema extends Main
                 $data[] = '#[ORM\HasLifecycleCallbacks]';
                 $data[] = 'class ' . $entity . ' {';
                 $data[] = '';
+
+                $columns = $read->get('Schema.columns');
+                if($columns && is_array($columns)){
+                    foreach($columns as $nr => $column){
+                        ddd($column);
+                    }
+                }
+
+                $data[] = '';
                 $data[] = '}';
                 ddd($data);
             }
