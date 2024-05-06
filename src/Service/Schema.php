@@ -65,7 +65,11 @@ class Schema extends Main
                 $data[] = '';
                 $data[] = 'namespace Entity;';
                 foreach($use as $usage){
-                    $data[] = 'use ' . $usage . ';';
+                    if($usage === ''){
+                        $data[] = '';
+                    } else {
+                        $data[] = 'use ' . $usage . ';';
+                    }
                 }
                 ddd($data);
             }
