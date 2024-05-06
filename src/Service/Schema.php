@@ -129,7 +129,61 @@ class Schema extends Main
                         ){
                             $data[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
                         }
-                        $data[] = 'protected $' . $column->name . ';';
+                        $type = null;
+                        switch($column->type){
+                            case 'smallint':
+                            case 'integer':
+                                $type = '?int';
+                                break;
+                            case 'double':
+                            case 'float':
+                                $type = '?float';
+                                break;
+                            case 'array':
+                            case 'simple_array':
+                                $type = '?array';
+                                break;
+                            case 'object':
+                                $type = '?object';
+                                break;
+                            case 'time':
+                            case 'date':
+                            case 'datetime':
+                            case 'datetimetz':
+                                $type = '?DateTime';
+                                break;
+                            case 'time_immutable':
+                            case 'date_immutable':
+                            case 'datetimetz_immutable':
+                                $type = '?DateTimeImmutable';
+                                break;
+                            case 'dateinterval':
+                                $type = '?DateInterval';
+                                break;
+                            case 'decimal':
+                            case 'bigint':
+                            case 'text':
+                            case 'ascii_string':
+                            case 'varchar':
+                            case 'guid':
+                                $type = '?string';
+                                break;
+                            case 'blob':
+                            case 'binary':
+                                $type = '?resource';
+                                break;
+                            case 'json':
+                                $type = '?mixed';
+                                break;
+                            case 'boolean':
+                                $type = '?bool';
+                                break;
+                            default :
+                                $type = '?string';
+                                break;
+
+                        }
+                        $data[] = 'protected ' . $type . ' $' . $column->name . ';';
                     }
                 }
 
