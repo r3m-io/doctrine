@@ -197,10 +197,34 @@ class Schema extends Main
                             if($is_get){
                                 if($is_encrypted){
                                     $get = [];
+                                    $get[] = '/**';
+                                    $get[] = '* @throws Exception';
+                                    $get[] = '*/';
                                     $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
                                     $get[] = '{';
                                     $get[] = '    try {';
                                     $get[] = '        $object = $this->object();';
+                                    $get[] = '        if(!$object){';
+                                    $get[] = '            throw new Exception(\'Object not set...\');';
+                                    $get[] = '        }';
+                                    $get[] = '        if(!$this->is_encrypted_' . strtolower($column->name) . '){';
+                                    $get[] = '            return $this->' . $column->name . ';';
+                                    $get[] = '        }';
+                                    $get[] = '        $url = $object->config(\'project.dir.data\') . \'Defuse/Email.key\';';
+                                    $get[] = '        if(File::exist($url)){';
+                                    $get[] = '             $string = File::read($url);';
+                                    $get[] = '             $key = Key::loadFromAsciiSafeString($string);';
+                                    $get[] = '             if(is_array($this->' . $column->name . ')){';
+                                    $get[] = '                 foreach($this->' . $column->name . ' as $nr => $value){';
+                                    $get[] = '                     $this->' . $column->name . '[$nr] = Crypto::decrypt($value, $key);';
+                                    $get[] = '                 }';
+                                    $get[] = '             } else {';
+                                    $get[] = '                 $this->' . $column->name . ' = Crypto::decrypt($this->' . $column->name . ', $key);';
+                                    $get[] = '             }';
+                                    $get[] = '             $this->is_encrypted_' . strtolower($column->name) . ' = false;';
+                                    $get[] = '        } else {';
+                                    $get[] = '            throw new Exception(' . "'Key not found...'" . ');';
+                                    $get[] = '        }';
                                     $get[] = '        return $this->' . $column->name . ';';
                                     $get[] = '    } catch (Exception | BadFormatException | EnvironmentIsBrokenException | WrongKeyOrModifiedCiphertextException $exception) {';
                                     $get[] = '        return null;';
@@ -284,7 +308,7 @@ class Schema extends Main
                     $data_functions[] = $record_object_set;
                     $data_functions[] = $record_object_get;
                     foreach($encrypted as $nr => $column){
-                        $data_columns[] = 'protected boolean $is_encrypted_' . $column . ' = true;';
+                        $data_columns[] = 'protected boolean $is_encrypted_' . strtolower($column) . ' = true;';
                     }
                 }
                 $use[] = '';
