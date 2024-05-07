@@ -5,6 +5,7 @@ use R3m\Io\App;
 
 use Exception;
 use R3m\Io\Module\Controller;
+use R3m\Io\Module\File;
 
 class Schema extends Main
 
@@ -396,7 +397,7 @@ class Schema extends Main
                     $use[] = 'R3m\Io\App';
                     $data_columns[] = 'protected App $object;';
                     $record_object = [];
-                    $record_object[] = 'public function object($object=null): App';
+                    $record_object[] = 'public function object($object=null): ?App';
                     $record_object[] = '{';
                     $record_object[] = '    if($object !== null){';
                     $record_object[] = '        $this->setObject($object);';
@@ -409,7 +410,7 @@ class Schema extends Main
                     $record_object_set[] = '    $this->object = $object;';
                     $record_object_set[] = '}';
                     $record_object_get = [];
-                    $record_object_get[] = 'public function getObject(): App';
+                    $record_object_get[] = 'public function getObject(): ?App';
                     $record_object_get[] = '{';
                     $record_object_get[] = '    return $this->object;';
                     $record_object_get[] = '}';
@@ -457,11 +458,9 @@ class Schema extends Main
                     $data[] = '';
                 }
                 $data[] = '}';
-                ddd($data);
+                File::write($target, implode(PHP_EOL, $data));
             }
         }
-
-        ddd($options);
     }
 
 }
