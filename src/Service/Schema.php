@@ -61,18 +61,19 @@ class Schema extends Main
                             $is_both = false;
                         }
                         if(
-                            property_exists($column, 'options') &&
-                            property_exists($column->options, 'encrypted') &&
-                            $column->options->encrypted === true
-                        ){
-                            $encrypted[] = $column->name;
-                        }
-                        if(
                             property_exists($column, 'type')
                         ){
                             $column_value = 'type: ' . $column->type;
                             $column_value .= ', name: "`' . $column->name . '`"';
                             $is_null = false;
+                            d($column->options ?? '');
+                            if(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'encrypted') &&
+                                $column->options->encrypted === true
+                            ){
+                                $encrypted[] = $column->name;
+                            }
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
