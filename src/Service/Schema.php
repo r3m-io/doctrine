@@ -35,31 +35,6 @@ class Schema extends Main
                     $entity .
                     $object->config('extension.php')
                 ;
-
-                $use = [];
-                $use[] = 'DateTime';
-                $use[] = '';
-                $use[] = 'Defuse\Crypto\Crypto';
-                $use[] = 'Defuse\Crypto\Exception\BadFormatException';
-                $use[] = 'Defuse\Crypto\Exception\EnvironmentIsBrokenException';
-                $use[] = 'Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException';
-                $use[] = 'Defuse\Crypto\Key';
-                $use[] = '';
-                $use[] = 'Doctrine\ORM\Mapping as ORM';
-                $use[] = 'Doctrine\ORM\Mapping\PrePersist';
-                $use[] = 'Doctrine\ORM\Mapping\PreUpdate';
-                $use[] = 'Doctrine\ORM\Event\PrePersistEventArgs';
-                $use[] = 'Doctrine\ORM\Event\PreUpdateEventArgs';
-                $use[] = '';
-                $use[] = 'R3m\Io\App';
-                $use[] = '';
-                $use[] = 'R3m\Io\Module\Core';
-                $use[] = 'R3m\Io\Module\File';
-                $use[] = '';
-                $use[] = 'Exception';
-                $use[] = '';
-                $use[] = 'R3m\Io\Exception\FileWriteException';
-
                 $data = [];
                 $data[] = '<?php';
                 $data[] = '';
@@ -68,8 +43,12 @@ class Schema extends Main
                 $columns = $read->get('Schema.columns');
                 $data_columns = [];
                 $data_functions = [];
+                $encrypted = [];
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
+                        $is_set = true;
+                        $is_get = true;
+                        $is_both = true;
                         /*
                         $get = 'get' . ucfirst($column->name);
                         $set = 'set' . ucfirst($column->name);
@@ -81,6 +60,15 @@ class Schema extends Main
                             $column->options->id === true
                         ){
                             $data_columns[] = '#[ORM\Id]';
+                            $is_set = false;
+                            $is_both = false;
+                        }
+                        if(
+                            property_exists($column, 'options') &&
+                            property_exists($column->options, 'encrypted') &&
+                            $column->options->encrypted === true
+                        ){
+                            $encrypted[] = $column->name;
                         }
                         if(
                             property_exists($column, 'type')
@@ -115,10 +103,17 @@ class Schema extends Main
                         }
                         if(
                             property_exists($column, 'options') &&
-                            property_exists($column->options, 'autoincrement') &&
-                            $column->options->autoincrement === true
+                            property_exists($column->options, 'autoincrement')
                         ){
-                            $data_columns[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
+                            if(is_string($column->options->autoincrement)){
+                                $data_columns[] = '#[ORM\GeneratedValue(strategy: "' . $column->options->autoincrement . '")]';
+                            }
+                            elseif(
+                                is_bool($column->options->autoincrement) &&
+                                $column->options->autoincrement === true
+                            ) {
+                                $data_columns[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
+                            }
                         }
                         $type = null;
                         switch($column->type){
@@ -178,11 +173,59 @@ class Schema extends Main
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
                         } else {
                             $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
+                            if($is_both){
+                                $both = [];
+                                $both[] = 'public function ' . $column->name . '(?' . $type . ' $' . $column->name . '=null): ?' . $type . ' {';
+                                $both[] = '    if($' . $column->name . ' !== null){';
+                                $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
+                                $both[] = '    }';
+                                $both[] = '    return $this->' . $column->name . ';';
+                                $both[] = '}';
+                                $data_functions[] = $both;
+                            }
+                            if($is_set){
+                                $set = [];
+                                $set[] = 'public function set' . ucfirst($column->name) . '(' . $type . ' $' . $column->name . '): void {';
+                                $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                $set[] = '}';
+                                $data_functions[] = $set;
+                            }
+                            if($is_get){
+                                $get = [];
+                                $get[] = 'public function get' . ucfirst($column->name) . '(): ' . $type . ' {';
+                                $get[] = '    return $this->' . $column->name . ';';
+                                $get[] = '}';
+                                $data_functions[] = $get;
+                            }
                         }
                     }
                 }
+                $use = [];
+                $use[] = 'DateTime';
+                $use[] = '';
 
-
+                if(array_key_exists(0, $encrypted)){
+                    $use[] = 'Defuse\Crypto\Crypto';
+                    $use[] = 'Defuse\Crypto\Exception\BadFormatException';
+                    $use[] = 'Defuse\Crypto\Exception\EnvironmentIsBrokenException';
+                    $use[] = 'Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException';
+                    $use[] = 'Defuse\Crypto\Key';
+                    $use[] = '';
+                    $use[] = 'R3m\Io\App';
+                }
+                $use[] = '';
+                $use[] = 'Doctrine\ORM\Mapping as ORM';
+                $use[] = 'Doctrine\ORM\Mapping\PrePersist';
+                $use[] = 'Doctrine\ORM\Mapping\PreUpdate';
+                $use[] = 'Doctrine\ORM\Event\PrePersistEventArgs';
+                $use[] = 'Doctrine\ORM\Event\PreUpdateEventArgs';
+                $use[] = '';
+                $use[] = 'R3m\Io\Module\Core';
+                $use[] = 'R3m\Io\Module\File';
+                $use[] = '';
+                $use[] = 'Exception';
+                $use[] = '';
+                $use[] = 'R3m\Io\Exception\FileWriteException';
                 foreach($use as $usage){
                     if($usage === ''){
                         $data[] = '';
@@ -200,6 +243,9 @@ class Schema extends Main
                     $data[] = '    ' . $row;
                 }
                 $data[] = '';
+                foreach ($data_functions as $nr => $row){
+                    $data[] = '    ' . $row;
+                }
                 $data[] = '}';
                 ddd($data);
             }
