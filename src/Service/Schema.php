@@ -98,6 +98,7 @@ class Schema extends Main
                         ){
                             $column_value = 'type: ' . $column->type;
                             $column_value .= ', name: "`' . $column->name . '`"';
+                            $is_null = false;
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
@@ -111,6 +112,7 @@ class Schema extends Main
                                 $column->options->nullable === true
                             ){
                                 $column_value .= ', nullable: true';
+                                $is_null = true;
                             }
                             if(
                                 property_exists($column, 'options') &&
@@ -133,32 +135,32 @@ class Schema extends Main
                         switch($column->type){
                             case 'smallint':
                             case 'integer':
-                                $type = '?int';
+                                $type = 'int';
                                 break;
                             case 'double':
                             case 'float':
-                                $type = '?float';
+                                $type = 'float';
                                 break;
                             case 'array':
                             case 'simple_array':
-                                $type = '?array';
+                                $type = 'array';
                                 break;
                             case 'object':
-                                $type = '?object';
+                                $type = 'object';
                                 break;
                             case 'time':
                             case 'date':
                             case 'datetime':
                             case 'datetimetz':
-                                $type = '?DateTime';
+                                $type = 'DateTime';
                                 break;
                             case 'time_immutable':
                             case 'date_immutable':
                             case 'datetimetz_immutable':
-                                $type = '?DateTimeImmutable';
+                                $type = 'DateTimeImmutable';
                                 break;
                             case 'dateinterval':
-                                $type = '?DateInterval';
+                                $type = 'DateInterval';
                                 break;
                             case 'decimal':
                             case 'bigint':
@@ -166,24 +168,28 @@ class Schema extends Main
                             case 'ascii_string':
                             case 'varchar':
                             case 'guid':
-                                $type = '?string';
+                                $type = 'string';
                                 break;
                             case 'blob':
                             case 'binary':
-                                $type = '?resource';
+                                $type = 'resource';
                                 break;
                             case 'json':
-                                $type = '?mixed';
+                                $type = 'mixed';
                                 break;
                             case 'boolean':
-                                $type = '?bool';
+                                $type = 'bool';
                                 break;
                             default :
-                                $type = '?string';
+                                $type = 'string';
                                 break;
 
                         }
-                        $data[] = 'protected ' . $type . ' $' . $column->name . ';';
+                        if($is_null){
+                            $data[] = 'protected ?' . $type . ' $' . $column->name . ';';
+                        } else {
+                            $data[] = 'protected ' . $type . ' $' . $column->name . ';';
+                        }
                     }
                 }
 
