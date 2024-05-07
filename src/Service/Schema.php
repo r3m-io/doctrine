@@ -483,12 +483,10 @@ class Schema extends Main
                         $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
                         $data[] = '            }';
                     }
+                    $data[] = '        }';
                 }
                 if($is_updated){
-                    $data[] = '            $this->setIsUpdated(new DateTime());';
-                }
-                if(array_key_exists(0, $encrypted)) {
-                    $data[] = '        }';
+                    $data[] = '        $this->setIsUpdated(new DateTime());';
                 }
                 $data[] = '    }';
 
