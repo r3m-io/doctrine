@@ -176,9 +176,9 @@ class Schema extends Main
                             $both[] = 'public function ' . str_replace('.', '',lcfirst(Controller::name($column->name))) . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
                             $both[] = '{';
                             $both[] = '    if($' . $column->name . ' !== null){';
-                            $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
+                            $both[] = '        $this->set' . str_replace('.', '', Controller::name($column->name)) . '($' . $column->name . ');';
                             $both[] = '    }';
-                            $both[] = '    return $this->' . $column->name . ';';
+                            $both[] = '    return $this->get' . str_replace('.', '', Controller::name($column->name)) . '();';
                             $both[] = '}';
                             $data_functions[] = $both;
                         }
