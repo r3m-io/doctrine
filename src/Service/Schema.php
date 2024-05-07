@@ -172,7 +172,7 @@ class Schema extends Main
                         }
                         if($is_both){
                             $both = [];
-                            $both[] = 'public function ' . lcfirst(Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
+                            $both[] = 'public function ' . str_replace('.', '',lcfirst(Controller::name($column->name))) . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
                             $both[] = '{';
                             $both[] = '    if($' . $column->name . ' !== null){';
                             $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
@@ -185,7 +185,7 @@ class Schema extends Main
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
                             if($is_set){
                                 $set = [];
-                                $set[] = 'public function set' . Controller::name($column->name) . '(' . $type . ' $' . $column->name . '=null): void';
+                                $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
                                 $set[] = '{';
                                 $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                 $set[] = '}';
@@ -193,7 +193,7 @@ class Schema extends Main
                             }
                             if($is_get){
                                 $get = [];
-                                $get[] = 'public function get' . Controller::name($column->name) . '(): ?' . $type;
+                                $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
                                 $get[] = '{';
                                 $get[] = '    return $this->' . $column->name . ';';
                                 $get[] = '}';
@@ -203,7 +203,7 @@ class Schema extends Main
                             $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                             if($is_set){
                                 $set = [];
-                                $set[] = 'public function set' . Controller::name($column->name) . '(' . $type . ' $' . $column->name . '): void';
+                                $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '): void';
                                 $set[] = '{';
                                 $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                 $set[] = '}';
@@ -211,7 +211,7 @@ class Schema extends Main
                             }
                             if($is_get){
                                 $get = [];
-                                $get[] = 'public function get' . Controller::name($column->name) . '(): ' . $type;
+                                $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
                                 $get[] = '{';
                                 $get[] = '    return $this->' . $column->name . ';';
                                 $get[] = '}';
