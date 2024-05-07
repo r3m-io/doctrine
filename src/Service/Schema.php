@@ -50,11 +50,7 @@ class Schema extends Main
                         $is_set = true;
                         $is_get = true;
                         $is_both = true;
-                        /*
-                        $get = 'get' . ucfirst($column->name);
-                        $set = 'set' . ucfirst($column->name);
-                        $both = $column->name;
-                        */
+                        $options_default = null;
                         if(
                             property_exists($column, 'options') &&
                             property_exists($column->options, 'id') &&
@@ -97,7 +93,12 @@ class Schema extends Main
                                 property_exists($column->options, 'default')
                             ){
                                 if($column->options->default !== null){
-                                    $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                                    if(is_numeric($column->options->default)){
+                                        $options_default = $column->options->default + 0;
+                                        $column_value .= ', options: ["default": ' . $options_default . ']';
+                                    } else {
+                                        $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                                    }
                                 }
                             }
                             $data_columns[] = '#[ORM\column(' . $column_value . ')]';
@@ -200,7 +201,27 @@ class Schema extends Main
                                 $data_functions[] = $get;
                             }
                         } else {
-                            $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
+                            if($options_default !== null){
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = ' . $options_default . ';';
+                            }
+                            elseif(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'default') &&
+                                $column->options->default !== null
+                            ){
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
+                            }
+                            elseif(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'default') &&
+                                $column->options->default === null
+                            ){
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = null;';
+                            }
+                            else {
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
+                            }
+
                             if($is_set){
                                 $set = [];
                                 $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '): void';
