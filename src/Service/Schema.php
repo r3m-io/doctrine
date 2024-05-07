@@ -48,11 +48,19 @@ class Schema extends Main
                 $encrypted = [];
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
+                        $is_uuid = false;
+                        $is_updated = false;
                         $is_set = true;
                         $is_get = true;
                         $is_both = true;
                         $is_encrypted = false;
                         $options_default = null;
+                        if($column->name === 'uuid'){
+                           $is_uuid = true;
+                        }
+                        elseif($column->name === 'is_updated'){
+                            $is_updated = true;
+                        }
                         if(
                             property_exists($column, 'options') &&
                             property_exists($column->options, 'id') &&
@@ -461,7 +469,9 @@ class Schema extends Main
                 $data[] = '    #[PrePersist]';
                 $data[] = '    public function prePersist(PrePersistEventArgs $args): void';
                 $data[] = '    {';
-                $data[] = '        $this->setUuid(Core::uuid());';
+                if($is_uuid){
+                    $data[] = '        $this->setUuid(Core::uuid());';
+                }
                 $data[] = '    }';
                 $data[] = '';
                 $data[] = '    #[PreUpdate]';
@@ -474,7 +484,9 @@ class Schema extends Main
                     $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
                     $data[] = '            }';
                 }
-                $data[] = '            $this->setIsUpdated(new DateTime());';
+                if($is_updated){
+                    $data[] = '            $this->setIsUpdated(new DateTime());';
+                }
                 $data[] = '        }';
                 $data[] = '    }';
 
