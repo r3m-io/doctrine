@@ -183,7 +183,7 @@ class Schema extends Main
                             $data_functions[] = $both;
                         }
                         if($is_null){
-                            $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
+                            $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
                             if($is_set){
                                 $set = [];
                                 $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
@@ -210,13 +210,6 @@ class Schema extends Main
                                 $column->options->default !== null
                             ){
                                 $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
-                            }
-                            elseif(
-                                property_exists($column, 'options') &&
-                                property_exists($column->options, 'default') &&
-                                $column->options->default === null
-                            ){
-                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = null;';
                             }
                             else {
                                 $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
