@@ -64,21 +64,10 @@ class Schema extends Main
                 $data[] = '<?php';
                 $data[] = '';
                 $data[] = 'namespace Entity;';
-                foreach($use as $usage){
-                    if($usage === ''){
-                        $data[] = '';
-                    } else {
-                        $data[] = 'use ' . $usage . ';';
-                    }
-                }
-                $data[] = '';
-                $data[] = '#[ORM\Entity]';
-                $data[] = '#[ORM\Table(name: "' . $table . '")]';
-                $data[] = '#[ORM\HasLifecycleCallbacks]';
-                $data[] = 'class ' . $entity . ' {';
-                $data[] = '';
 
                 $columns = $read->get('Schema.columns');
+                $data_columns = [];
+                $data_functions = [];
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
                         /*
@@ -91,7 +80,7 @@ class Schema extends Main
                             property_exists($column->options, 'id') &&
                             $column->options->id === true
                         ){
-                            $data[] = '#[ORM\Id]';
+                            $data_columns[] = '#[ORM\Id]';
                         }
                         if(
                             property_exists($column, 'type')
@@ -122,14 +111,14 @@ class Schema extends Main
                                     $column_value .= ', options: ["default": "' . $column->options->default . '"]';
                                 }
                             }
-                            $data[] = '#[ORM\column(' . $column_value . ')]';
+                            $data_columns[] = '#[ORM\column(' . $column_value . ')]';
                         }
                         if(
                             property_exists($column, 'options') &&
                             property_exists($column->options, 'autoincrement') &&
                             $column->options->autoincrement === true
                         ){
-                            $data[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
+                            $data_columns[] = '#[ORM\GeneratedValue(strategy: "AUTO")]';
                         }
                         $type = null;
                         switch($column->type){
@@ -186,13 +175,30 @@ class Schema extends Main
 
                         }
                         if($is_null){
-                            $data[] = 'protected ?' . $type . ' $' . $column->name . ';';
+                            $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
                         } else {
-                            $data[] = 'protected ' . $type . ' $' . $column->name . ';';
+                            $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                         }
                     }
                 }
 
+
+                foreach($use as $usage){
+                    if($usage === ''){
+                        $data[] = '';
+                    } else {
+                        $data[] = 'use ' . $usage . ';';
+                    }
+                }
+                $data[] = '';
+                $data[] = '#[ORM\Entity]';
+                $data[] = '#[ORM\Table(name: "' . $table . '")]';
+                $data[] = '#[ORM\HasLifecycleCallbacks]';
+                $data[] = 'class ' . $entity . ' {';
+                $data[] = '';
+                foreach($data_columns as $nr => $row){
+                    $data[] = '    ' . $row;
+                }
                 $data[] = '';
                 $data[] = '}';
                 ddd($data);
