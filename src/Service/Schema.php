@@ -171,6 +171,29 @@ class Schema extends Main
                                 break;
 
                         }
+                        if(array_key_exists(0, $encrypted)){
+                            $record_object = [];
+                            $record_object[] = 'public function object($object=null): App';
+                            $record_object[] = '{';
+                            $record_object[] = '    if($object !== null){';
+                            $record_object[] = '        $this->setObject($object);';
+                            $record_object[] = '    }';
+                            $record_object[] = '    return $this->getObject();';
+                            $record_object[] = '}';
+                            $record_object_set = [];
+                            $record_object_set[] = 'public function setObject(App $object): void';
+                            $record_object_set[] = '{';
+                            $record_object_set[] = '    $this->object = $object;';
+                            $record_object_set[] = '}';
+                            $record_object_get = [];
+                            $record_object_get[] = 'public function getObject(): App';
+                            $record_object_get[] = '{';
+                            $record_object_get[] = '    return $this->object;';
+                            $record_object_get[] = '}';
+                            $data_functions[] = $record_object;
+                            $data_functions[] = $record_object_set;
+                            $data_functions[] = $record_object_get;
+                        }
                         if($is_both){
                             $both = [];
                             $both[] = 'public function ' . str_replace('.', '',lcfirst(Controller::name($column->name))) . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
@@ -193,11 +216,25 @@ class Schema extends Main
                                 $data_functions[] = $set;
                             }
                             if($is_get){
-                                $get = [];
-                                $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
-                                $get[] = '{';
-                                $get[] = '    return $this->' . $column->name . ';';
-                                $get[] = '}';
+                                if(array_key_exists(0, $encrypted)){
+                                    $get = [];
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
+                                    $get[] = '{';
+                                    $get[] = '    try {';
+                                    $get[] = '        $object = $this->object();';
+                                    $get[] = '        return $this->' . $column->name . ';';
+                                    $get[] = '    } catch (Exception | BadFormatException | EnvironmentIsBrokenException | WrongKeyOrModifiedCiphertextException $exception) {';
+                                    $get[] = '        return null;';
+                                    $get[] = '    }';
+                                    $get[] = '}';
+                                } else {
+                                    $get = [];
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
+                                    $get[] = '{';
+                                    $get[] = '    return $this->' . $column->name . ';';
+                                    $get[] = '}';
+                                }
+
                                 $data_functions[] = $get;
                             }
                         } else {
