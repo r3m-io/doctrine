@@ -66,14 +66,6 @@ class Schema extends Main
                             $column_value = 'type: ' . $column->type;
                             $column_value .= ', name: "`' . $column->name . '`"';
                             $is_null = false;
-                            d($column->options ?? '');
-                            if(
-                                property_exists($column, 'options') &&
-                                property_exists($column->options, 'encryption') &&
-                                $column->options->encryption === true
-                            ){
-                                $encrypted[] = $column->name;
-                            }
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
@@ -182,6 +174,13 @@ class Schema extends Main
                             $both[] = '    return $this->get' . str_replace('.', '', Controller::name($column->name)) . '();';
                             $both[] = '}';
                             $data_functions[] = $both;
+                        }
+                        if(
+                            property_exists($column, 'options') &&
+                            property_exists($column->options, 'encryption') &&
+                            $column->options->encryption === true
+                        ){
+                            $encrypted[] = $column->name;
                         }
                         if($is_null){
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
