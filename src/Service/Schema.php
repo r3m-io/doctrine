@@ -280,7 +280,7 @@ class Schema extends Main
                                 $column->options->default !== null
                             ){
                                 if($column->options->default = 'CURRENT_TIMESTAMP'){
-                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = new DateTime();';
+                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = new ' . $type . '();';
                                 } else {
                                     $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
                                 }
