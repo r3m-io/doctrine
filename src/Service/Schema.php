@@ -69,8 +69,8 @@ class Schema extends Main
                             d($column->options ?? '');
                             if(
                                 property_exists($column, 'options') &&
-                                property_exists($column->options, 'encrypted') &&
-                                $column->options->encrypted === true
+                                property_exists($column->options, 'encryption') &&
+                                $column->options->encryption === true
                             ){
                                 $encrypted[] = $column->name;
                             }
