@@ -171,7 +171,8 @@ class Schema extends Main
                         }
                         if($is_both){
                             $both = [];
-                            $both[] = 'public function ' . $column->name . '(?' . $type . ' $' . $column->name . '=null): ?' . $type . ' {';
+                            $both[] = 'public function ' . $column->name . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
+                            $both[] = '{';
                             $both[] = '    if($' . $column->name . ' !== null){';
                             $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
                             $both[] = '    }';
@@ -183,14 +184,16 @@ class Schema extends Main
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
                             if($is_set){
                                 $set = [];
-                                $set[] = 'public function set' . ucfirst($column->name) . '(?' . $type . ' $' . $column->name . '=null): void {';
+                                $set[] = 'public function set' . ucfirst($column->name) . '(' . $type . ' $' . $column->name . '=null): void';
+                                $set[] = '{';
                                 $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                 $set[] = '}';
                                 $data_functions[] = $set;
                             }
                             if($is_get){
                                 $get = [];
-                                $get[] = 'public function get' . ucfirst($column->name) . '(): ?' . $type . ' {';
+                                $get[] = 'public function get' . ucfirst($column->name) . '(): ?' . $type;
+                                $get[] = '{';
                                 $get[] = '    return $this->' . $column->name . ';';
                                 $get[] = '}';
                                 $data_functions[] = $get;
@@ -199,14 +202,16 @@ class Schema extends Main
                             $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                             if($is_set){
                                 $set = [];
-                                $set[] = 'public function set' . ucfirst($column->name) . '(' . $type . ' $' . $column->name . '): void {';
+                                $set[] = 'public function set' . ucfirst($column->name) . '(' . $type . ' $' . $column->name . '): void';
+                                $set[] = '{';
                                 $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                 $set[] = '}';
                                 $data_functions[] = $set;
                             }
                             if($is_get){
                                 $get = [];
-                                $get[] = 'public function get' . ucfirst($column->name) . '(): ' . $type . ' {';
+                                $get[] = 'public function get' . ucfirst($column->name) . '(): ' . $type;
+                                $get[] = '{';
                                 $get[] = '    return $this->' . $column->name . ';';
                                 $get[] = '}';
                                 $data_functions[] = $get;
