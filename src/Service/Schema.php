@@ -257,8 +257,11 @@ class Schema extends Main
                     $data[] = '    ' . $row;
                 }
                 $data[] = '';
-                foreach ($data_functions as $nr => $row){
-                    $data[] = '    ' . $row;
+                foreach ($data_functions as $nr => $set){
+                    foreach($set as $nr => $row){
+                        $data[] = '    ' . $row;
+                    }
+                    $data[] = '';
                 }
                 $data[] = '}';
                 ddd($data);
