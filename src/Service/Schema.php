@@ -46,10 +46,10 @@ class Schema extends Main
                 $data_columns = [];
                 $data_functions = [];
                 $encrypted = [];
+                $is_uuid = false;
+                $is_updated = false;
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
-                        $is_uuid = false;
-                        $is_updated = false;
                         $is_set = true;
                         $is_get = true;
                         $is_both = true;
@@ -58,7 +58,7 @@ class Schema extends Main
                         if($column->name === 'uuid'){
                            $is_uuid = true;
                         }
-                        elseif($column->name === 'is_updated'){
+                        if($column->name === 'is_updated'){
                             $is_updated = true;
                         }
                         if(
@@ -111,7 +111,7 @@ class Schema extends Main
                             property_exists($column->options, 'autoincrement')
                         ){
                             if(is_string($column->options->autoincrement)){
-                                $data_columns[] = '#[ORM\GeneratedValue(strategy: "' . $column->options->autoincrement . '")]';
+                                $data_columns[] = '#[ORM\GeneratedValue(strategy: "' . strtoupper($column->options->autoincrement) . '")]';
                             }
                             elseif(
                                 is_bool($column->options->autoincrement) &&
@@ -235,7 +235,6 @@ class Schema extends Main
                                     $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                     $set[] = '}';
                                 }
-
                                 $data_functions[] = $set;
                             }
                             if($is_get){
@@ -281,7 +280,6 @@ class Schema extends Main
                                     $get[] = '    return $this->' . $column->name . ';';
                                     $get[] = '}';
                                 }
-
                                 $data_functions[] = $get;
                             }
                         } else {
@@ -342,7 +340,6 @@ class Schema extends Main
                                     $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
                                     $set[] = '}';
                                 }
-
                                 $data_functions[] = $set;
                             }
                             if($is_get){
@@ -477,17 +474,22 @@ class Schema extends Main
                 $data[] = '    #[PreUpdate]';
                 $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
                 $data[] = '    {';
-                $data[] = '        $object = $this->getObject();';
-                $data[] = '        if($object){';
-                foreach($encrypted as $nr => $column){
-                    $data[] = '            if($this->is_encrypted_' . strtolower($column) . ' === false){';
-                    $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
-                    $data[] = '            }';
+
+                if(array_key_exists(0, $encrypted)){
+                    $data[] = '        $object = $this->getObject();';
+                    $data[] = '        if($object){';
+                    foreach($encrypted as $nr => $column){
+                        $data[] = '            if($this->is_encrypted_' . strtolower($column) . ' === false){';
+                        $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
+                        $data[] = '            }';
+                    }
                 }
                 if($is_updated){
                     $data[] = '            $this->setIsUpdated(new DateTime());';
                 }
-                $data[] = '        }';
+                if(array_key_exists(0, $encrypted)) {
+                    $data[] = '        }';
+                }
                 $data[] = '    }';
 
                 /*
