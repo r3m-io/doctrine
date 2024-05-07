@@ -191,6 +191,10 @@ class Schema extends Main
                                     $set = [];
                                     $set[] = '/**';
                                     $set[] = '* @throws Exception';
+                                    $set[] = '* @throws FileWriteException';
+                                    $set[] = '* @throws BadFormatException';
+                                    $set[] = '* @throws EnvironmentIsBrokenException';
+                                    $set[] = '* @throws WrongKeyOrModifiedCiphertextException';
                                     $set[] = '*/';
                                     $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
                                     $set[] = '{';
@@ -199,7 +203,6 @@ class Schema extends Main
                                     $set[] = '        throw new Exception(\'Object not set...\');';
                                     $set[] = '    }';
                                     $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
-                                    $set[] = '    $this->is_encrypted_' . strtolower($column->name) . ' = true;';
                                     $set[] = '    $url = $object->config(\'project.dir.data\') . \'Defuse/Email.key\';';
                                     $set[] = '    if(File::exist($url)){';
                                     $set[] = '        $key = Core::key($url);';
@@ -210,6 +213,7 @@ class Schema extends Main
                                     $set[] = '        } else {';
                                     $set[] = '            $this->column->name = Crypto::encrypt($this->column->name, $key);';
                                     $set[] = '        }';
+                                    $set[] = '        $this->is_encrypted_' . strtolower($column->name) . ' = true;';
                                     $set[] = '    } else {';
                                     $set[] = '        throw new Exception(\'Key not found...\');';
                                     $set[] = '    }';
@@ -290,11 +294,45 @@ class Schema extends Main
                             }
 
                             if($is_set){
-                                $set = [];
-                                $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '): void';
-                                $set[] = '{';
-                                $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
-                                $set[] = '}';
+                                if($is_encrypted){
+                                    $set = [];
+                                    $set[] = '/**';
+                                    $set[] = '* @throws Exception';
+                                    $set[] = '* @throws FileWriteException';
+                                    $set[] = '* @throws BadFormatException';
+                                    $set[] = '* @throws EnvironmentIsBrokenException';
+                                    $set[] = '* @throws WrongKeyOrModifiedCiphertextException';
+                                    $set[] = '*/';
+                                    $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '): void';
+                                    $set[] = '{';
+                                    $set[] = '    $object = $this->object();';
+                                    $set[] = '    if(!$object){';
+                                    $set[] = '        throw new Exception(\'Object not set...\');';
+                                    $set[] = '    }';
+                                    $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                    $set[] = '    $url = $object->config(\'project.dir.data\') . \'Defuse/Email.key\';';
+                                    $set[] = '    if(File::exist($url)){';
+                                    $set[] = '        $key = Core::key($url);';
+                                    $set[] = '        if(is_array($this->column->name)){';
+                                    $set[] = '            foreach($this->column->name as $nr => $value){';
+                                    $set[] = '                $this->column->name[$nr] = Crypto::encrypt($value, $key);';
+                                    $set[] = '            }';
+                                    $set[] = '        } else {';
+                                    $set[] = '            $this->column->name = Crypto::encrypt($this->column->name, $key);';
+                                    $set[] = '        }';
+                                    $set[] = '        $this->is_encrypted_' . strtolower($column->name) . ' = true;';
+                                    $set[] = '    } else {';
+                                    $set[] = '        throw new Exception(\'Key not found...\');';
+                                    $set[] = '    }';
+                                    $set[] = '}';
+                                } else {
+                                    $set = [];
+                                    $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '): void';
+                                    $set[] = '{';
+                                    $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                    $set[] = '}';
+                                }
+
                                 $data_functions[] = $set;
                             }
                             if($is_get){
