@@ -169,20 +169,34 @@ class Schema extends Main
                                 break;
 
                         }
+                        if($is_both){
+                            $both = [];
+                            $both[] = 'public function ' . $column->name . '(?' . $type . ' $' . $column->name . '=null): ?' . $type . ' {';
+                            $both[] = '    if($' . $column->name . ' !== null){';
+                            $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
+                            $both[] = '    }';
+                            $both[] = '    return $this->' . $column->name . ';';
+                            $both[] = '}';
+                            $data_functions[] = $both;
+                        }
                         if($is_null){
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ';';
+                            if($is_set){
+                                $set = [];
+                                $set[] = 'public function set' . ucfirst($column->name) . '(?' . $type . ' $' . $column->name . '=null): void {';
+                                $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                $set[] = '}';
+                                $data_functions[] = $set;
+                            }
+                            if($is_get){
+                                $get = [];
+                                $get[] = 'public function get' . ucfirst($column->name) . '(): ?' . $type . ' {';
+                                $get[] = '    return $this->' . $column->name . ';';
+                                $get[] = '}';
+                                $data_functions[] = $get;
+                            }
                         } else {
                             $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
-                            if($is_both){
-                                $both = [];
-                                $both[] = 'public function ' . $column->name . '(?' . $type . ' $' . $column->name . '=null): ?' . $type . ' {';
-                                $both[] = '    if($' . $column->name . ' !== null){';
-                                $both[] = '        $this->' . $column->name . ' = $' . $column->name . ';';
-                                $both[] = '    }';
-                                $both[] = '    return $this->' . $column->name . ';';
-                                $both[] = '}';
-                                $data_functions[] = $both;
-                            }
                             if($is_set){
                                 $set = [];
                                 $set[] = 'public function set' . ucfirst($column->name) . '(' . $type . ' $' . $column->name . '): void {';
