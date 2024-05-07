@@ -187,11 +187,41 @@ class Schema extends Main
                         if($is_null){
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
                             if($is_set){
-                                $set = [];
-                                $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
-                                $set[] = '{';
-                                $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
-                                $set[] = '}';
+                                if($is_encrypted){
+                                    $set = [];
+                                    $set[] = '/**';
+                                    $set[] = '* @throws Exception';
+                                    $set[] = '*/';
+                                    $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
+                                    $set[] = '{';
+                                    $set[] = '    $object = $this->object();';
+                                    $set[] = '    if(!$object){';
+                                    $set[] = '        throw new Exception(\'Object not set...\');';
+                                    $set[] = '    }';
+                                    $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                    $set[] = '    $this->is_encrypted_' . strtolower($column->name) . ' = true;';
+                                    $set[] = '    $url = $object->config(\'project.dir.data\') . \'Defuse/Email.key\';';
+                                    $set[] = '    if(File::exist($url)){';
+                                    $set[] = '        $key = Core::key($url);';
+                                    $set[] = '        if(is_array($this->column->name)){';
+                                    $set[] = '            foreach($this->column->name as $nr => $value){';
+                                    $set[] = '                $this->column->name[$nr] = Crypto::encrypt($value, $key);';
+                                    $set[] = '            }';
+                                    $set[] = '        } else {';
+                                    $set[] = '            $this->column->name = Crypto::encrypt($this->column->name, $key);';
+                                    $set[] = '        }';
+                                    $set[] = '    } else {';
+                                    $set[] = '        throw new Exception(\'Key not found...\');';
+                                    $set[] = '    }';
+                                    $set[] = '}';
+                                } else {
+                                    $set = [];
+                                    $set[] = 'public function set' . str_replace('.', '', Controller::name($column->name)) . '(' . $type . ' $' . $column->name . '=null): void';
+                                    $set[] = '{';
+                                    $set[] = '    $this->' . $column->name . ' = $' . $column->name . ';';
+                                    $set[] = '}';
+                                }
+
                                 $data_functions[] = $set;
                             }
                             if($is_get){
@@ -264,11 +294,48 @@ class Schema extends Main
                                 $data_functions[] = $set;
                             }
                             if($is_get){
-                                $get = [];
-                                $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
-                                $get[] = '{';
-                                $get[] = '    return $this->' . $column->name . ';';
-                                $get[] = '}';
+                                if($is_encrypted){
+                                    $get = [];
+                                    $get[] = '/**';
+                                    $get[] = '* @throws Exception';
+                                    $get[] = '*/';
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
+                                    $get[] = '{';
+                                    $get[] = '    try {';
+                                    $get[] = '        $object = $this->object();';
+                                    $get[] = '        if(!$object){';
+                                    $get[] = '            throw new Exception(\'Object not set...\');';
+                                    $get[] = '        }';
+                                    $get[] = '        if(!$this->is_encrypted_' . strtolower($column->name) . '){';
+                                    $get[] = '            return $this->' . $column->name . ';';
+                                    $get[] = '        }';
+                                    $get[] = '        $url = $object->config(\'project.dir.data\') . \'Defuse/Email.key\';';
+                                    $get[] = '        if(File::exist($url)){';
+                                    $get[] = '             $string = File::read($url);';
+                                    $get[] = '             $key = Key::loadFromAsciiSafeString($string);';
+                                    $get[] = '             if(is_array($this->' . $column->name . ')){';
+                                    $get[] = '                 foreach($this->' . $column->name . ' as $nr => $value){';
+                                    $get[] = '                     $this->' . $column->name . '[$nr] = Crypto::decrypt($value, $key);';
+                                    $get[] = '                 }';
+                                    $get[] = '             } else {';
+                                    $get[] = '                 $this->' . $column->name . ' = Crypto::decrypt($this->' . $column->name . ', $key);';
+                                    $get[] = '             }';
+                                    $get[] = '             $this->is_encrypted_' . strtolower($column->name) . ' = false;';
+                                    $get[] = '        } else {';
+                                    $get[] = '            throw new Exception(' . "'Key not found...'" . ');';
+                                    $get[] = '        }';
+                                    $get[] = '        return $this->' . $column->name . ';';
+                                    $get[] = '    } catch (Exception | BadFormatException | EnvironmentIsBrokenException | WrongKeyOrModifiedCiphertextException $exception) {';
+                                    $get[] = '        return $this->' . $column->name . ';';
+                                    $get[] = '    }';
+                                    $get[] = '}';
+                                } else {
+                                    $get = [];
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
+                                    $get[] = '{';
+                                    $get[] = '    return $this->' . $column->name . ';';
+                                    $get[] = '}';
+                                }
                                 $data_functions[] = $get;
                             }
                         }
