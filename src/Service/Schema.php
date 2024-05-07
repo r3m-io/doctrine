@@ -458,6 +458,46 @@ class Schema extends Main
                     }
                     $data[] = '';
                 }
+                $data[] = '    #[PrePersist]';
+                $data[] = '    public function prePersist(PrePersistEventArgs $args): void';
+                $data[] = '    {';
+                $data[] = '        $this->setUuid(Core::uuid());';
+                $data[] = '    }';
+                $data[] = '';
+                $data[] = '    #[PreUpdate]';
+                $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
+                $data[] = '    {';
+                $data[] = '        $object = $this->getObject();';
+                $data[] = '        if($object){';
+                foreach($encrypted as $nr => $column){
+                    $data[] = '            if($this->is_encrypted_' . strtolower($column) . ' === false){';
+                    $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
+                    $data[] = '            }';
+                }
+                $data[] = '            $this->setIsUpdated(new DateTime());';
+                $data[] = '        }';
+                $data[] = '    }';
+
+                /*
+                 * #[PreUpdate]
+    public function preUpdate(PreUpdateEventArgs $args): void
+    {
+        $object = $this->getObject();
+        if($object){
+            if($this->is_body_decrypted === true){
+                $this->setBody($this->getBody());
+            }
+            if($this->is_subject_decrypted === true){
+                $this->setSubject($this->getSubject());
+            }
+            if($this->is_text_decrypted === true){
+                $this->setText($this->getText());
+            }
+        }
+        $this->setIsUpdated(new DateTime());
+    }
+                 */
+
                 $data[] = '}';
                 File::write($target, implode(PHP_EOL, $data));
             }
