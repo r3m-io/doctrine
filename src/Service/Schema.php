@@ -50,6 +50,7 @@ class Schema extends Main
                         $is_set = true;
                         $is_get = true;
                         $is_both = true;
+                        $is_encrypted = false;
                         $options_default = null;
                         if(
                             property_exists($column, 'options') &&
@@ -181,6 +182,7 @@ class Schema extends Main
                             $column->options->encryption === true
                         ){
                             $encrypted[] = $column->name;
+                            $is_encrypted = true;
                         }
                         if($is_null){
                             $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
@@ -193,7 +195,7 @@ class Schema extends Main
                                 $data_functions[] = $set;
                             }
                             if($is_get){
-                                if(array_key_exists(0, $encrypted)){
+                                if($is_encrypted){
                                     $get = [];
                                     $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
                                     $get[] = '{';
