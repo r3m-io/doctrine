@@ -259,6 +259,7 @@ class Schema extends Main
                     $use[] = 'Defuse\Crypto\Key';
                     $use[] = '';
                     $use[] = 'R3m\Io\App';
+                    $data_columns[] = 'protected App $object;';
                     $record_object = [];
                     $record_object[] = 'public function object($object=null): App';
                     $record_object[] = '{';
@@ -280,6 +281,9 @@ class Schema extends Main
                     $data_functions[] = $record_object;
                     $data_functions[] = $record_object_set;
                     $data_functions[] = $record_object_get;
+                    foreach($encrypted as $nr => $column){
+                        $data_columns[] = 'protected boolean $is_encrypted_' . $column . ' = true;';
+                    }
                 }
                 $use[] = '';
                 $use[] = 'Doctrine\ORM\Mapping as ORM';
