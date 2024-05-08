@@ -204,7 +204,7 @@ class Schema extends Main
                         }
                         if($is_both){
                             $both = [];
-                            $both[] = 'public function ' . str_replace('.', '',lcfirst(Controller::name($column->name))) . '(' . $type . ' $' . $column->name . '=null): ?' . $type;
+                            $both[] = 'public function ' . str_replace('.', '',lcfirst(Controller::name($column->name))) . '(' . $type . ' $' . $column->name . '=null): ' . $return_type;
                             $both[] = '{';
                             $both[] = '    if($' . $column->name . ' !== null){';
                             $both[] = '        $this->set' . str_replace('.', '', Controller::name($column->name)) . '($' . $column->name . ');';
