@@ -88,22 +88,23 @@ class Schema extends Main
                         if(
                             property_exists($column, 'type')
                         ){
-                            $column_value = 'name: "`' . $column->name . '`"';
-                            $column_value .= ', type: "' . $column->type . '"';
+                            $column_value = [];
+                            $column_value[] = 'name: "`' . $column->name . '`"';
+                            $column_value[] = 'type: "' . $column->type . '"';
 
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
                                 $column->options->unique === true
                             ){
-                                $column_value .= ', unique: true';
+                                $column_value[] = 'unique: true';
                             }
                             if(
                                 property_exists($column, 'options') &&
                                 property_exists($column->options, 'nullable') &&
                                 $column->options->nullable === true
                             ){
-                                $column_value .= ', nullable: true';
+                                $column_value[] = 'nullable: true';
                                 $is_null = true;
                             }
                             if(
@@ -112,7 +113,7 @@ class Schema extends Main
                                 is_numeric($column->options->length)
                             ){
                                 $options_length = $column->options->length + 0;
-                                $column_value .= ', length: ' . $options_length;
+                                $column_value[] = 'length: ' . $options_length;
                             }
                             if(
                                 property_exists($column, 'options') &&
@@ -120,7 +121,7 @@ class Schema extends Main
                                 is_numeric($column->options->precision)
                             ){
                                 $options_precision = $column->options->precision + 0;
-                                $column_value .= ', precision: ' . $options_precision;
+                                $column_value[] = 'precision: ' . $options_precision;
                             }
                             if(
                                 property_exists($column, 'options') &&
@@ -128,7 +129,7 @@ class Schema extends Main
                                 is_numeric($column->options->scale)
                             ){
                                 $options_scale = $column->options->scale + 0;
-                                $column_value .= ', scale: ' . $options_scale;
+                                $column_value[] = 'scale: ' . $options_scale;
                             }
                             if(
                                 property_exists($column, 'options') &&
@@ -161,7 +162,7 @@ class Schema extends Main
                                 property_exists($column->options, 'definition') &&
                                 is_string($column->options->definition)
                             ){
-                                $column_value .= ', columnDefinition: "' . $column->options->definition . '"';
+                                $column_value[] = 'columnDefinition: "' . $column->options->definition . '"';
                             }
                             $options_all = [];
                             if($options_unsigned){
@@ -171,9 +172,9 @@ class Schema extends Main
                                 $options_all[] = $options_default;
                             }
                             if(array_key_exists(0, $options_all)){
-                                $column_value .= ', options: [' . implode(', ', $options_all) . ']';
+                                $column_value[] = 'options: [' . implode(', ', $options_all) . ']';
                             }
-                            $data_columns[] = '#[ORM\column(' . $column_value . ')]';
+                            $data_columns[] = '#[ORM\column(' . implode(', ' . PHP_EOL, $column_value) . PHP_EOL . ')]';
                         }
                         if(
                             property_exists($column, 'options') &&
