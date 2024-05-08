@@ -201,7 +201,11 @@ class Schema extends Main
                             $is_encrypted = true;
                         }
                         if($is_null){
-                            $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
+                            if($type === 'mixed'){
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = null;';
+                            } else {
+                                $data_columns[] = 'protected ?' . $type . ' $' . $column->name . ' = null;';
+                            }
                             $data_columns[] = '';
                             if($is_set){
                                 if($is_encrypted){
