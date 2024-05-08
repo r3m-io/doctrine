@@ -456,7 +456,7 @@ class Schema extends Main
                     $data_functions[] = $record_object_set;
                     $data_functions[] = $record_object_get;
                     foreach($encrypted as $nr => $column){
-                        $data_columns[] = 'protected boolean $is_encrypted_' . strtolower($column) . ' = true;';
+                        $data_columns[] = 'protected bool $is_encrypted_' . strtolower($column) . ' = true;';
                     }
                 }
                 $use[] = '';
