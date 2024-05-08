@@ -61,6 +61,7 @@ class Schema extends Main
                         $is_encrypted = false;
                         $is_null = false;
                         $options_default = null;
+                        $options_unsigned = null;
                         if($column->name === 'uuid'){
                            $is_uuid = true;
                         }
@@ -86,8 +87,9 @@ class Schema extends Main
                         if(
                             property_exists($column, 'type')
                         ){
-                            $column_value = 'type: "' . $column->type . '"';
-                            $column_value .= ', name: "`' . $column->name . '`"';
+                            $column_value = 'name: "`' . $column->name . '`"';
+                            $column_value .= ', type: "' . $column->type . '"';
+
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
@@ -105,16 +107,68 @@ class Schema extends Main
                             }
                             if(
                                 property_exists($column, 'options') &&
+                                property_exists($column->options, 'length') &&
+                                is_numeric($column->options->length)
+                            ){
+                                $options_length = $column->options->length + 0;
+                                $column_value .= ', length: ' . $options_length;
+                            }
+                            if(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'precision') &&
+                                is_numeric($column->options->precision)
+                            ){
+                                $options_precision = $column->options->precision + 0;
+                                $column_value .= ', precision: ' . $options_precision;
+                            }
+                            if(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'scale') &&
+                                is_numeric($column->options->scale)
+                            ){
+                                $options_scale = $column->options->scale + 0;
+                                $column_value .= ', scale: ' . $options_scale;
+                            }
+                            if(
+                                property_exists($column, 'options') &&
                                 property_exists($column->options, 'default')
                             ){
                                 if($column->options->default !== null){
                                     if(is_numeric($column->options->default)){
                                         $options_default = $column->options->default + 0;
-                                        $column_value .= ', options: ["default" => ' . $options_default . ']';
+                                        $options_default = '"default" => ' . $options_default;
                                     } else {
-                                        $column_value .= ', options: ["default" => "' . $column->options->default . '"]';
+                                        $options_default = '"default" => "' .  $column->options->default . '"';
                                     }
                                 }
+                            }
+                            if(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'unsigned')
+                            ){
+                                if(
+                                    is_bool($column->options->unsigned) &&
+                                    $column->options->unsigned === true
+                                ){
+                                    $options_unsigned = '"unsigned" => true';
+                                }
+                            }
+                            if(
+                                property_exists($column, 'options') &&
+                                property_exists($column->options, 'definition') &&
+                                is_string($column->options->definition)
+                            ){
+                                $column_value .= ', columnDefinition: "' . $column->options->definition . '"';
+                            }
+                            $options_all = [];
+                            if($options_unsigned){
+                                $options_all[] = $options_unsigned;
+                            }
+                            if($options_default){
+                                $options_all[] = $options_default;
+                            }
+                            if(array_key_exists(0, $options_all)){
+                                $column_value .= ', options: [' . implode(', ', $options_all) . ']';
                             }
                             $data_columns[] = '#[ORM\column(' . $column_value . ')]';
                         }
