@@ -174,7 +174,18 @@ class Schema extends Main
                             if(array_key_exists(0, $options_all)){
                                 $column_value[] = 'options: [' . implode(', ', $options_all) . ']';
                             }
-                            $data_columns[] = '#[ORM\column(' . implode(', ' . PHP_EOL, $column_value) . PHP_EOL . ')]';
+                            $data_columns[] = '#[ORM\column(' .
+                                PHP_EOL .
+                                implode(
+                                    ', ' .
+                                    PHP_EOL .
+                                    '        '
+                                    ,
+                                    $column_value
+                                ) .
+                                PHP_EOL .
+                                ')]'
+                            ;
                         }
                         if(
                             property_exists($column, 'options') &&
