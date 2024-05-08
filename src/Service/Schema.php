@@ -54,6 +54,7 @@ class Schema extends Main
                         $is_get = true;
                         $is_both = true;
                         $is_encrypted = false;
+                        $is_null = false;
                         $options_default = null;
                         if($column->name === 'uuid'){
                            $is_uuid = true;
