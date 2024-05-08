@@ -70,6 +70,7 @@ class Schema extends Main
                             $data_columns[] = '#[ORM\Id]';
                             $is_set = false;
                             $is_both = false;
+                            $is_null = true;
                         }
                         if(
                             property_exists($column, 'type')
@@ -99,9 +100,9 @@ class Schema extends Main
                                 if($column->options->default !== null){
                                     if(is_numeric($column->options->default)){
                                         $options_default = $column->options->default + 0;
-                                        $column_value .= ', options: ["default": ' . $options_default . ']';
+                                        $column_value .= ', options: ["default" => ' . $options_default . ']';
                                     } else {
-                                        $column_value .= ', options: ["default": "' . $column->options->default . '"]';
+                                        $column_value .= ', options: ["default" => "' . $column->options->default . '"]';
                                     }
                                 }
                             }
