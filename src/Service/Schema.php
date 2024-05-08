@@ -202,6 +202,14 @@ class Schema extends Main
                         } else {
                             $return_type = $type;
                         }
+                        if(
+                            property_exists($column, 'options') &&
+                            property_exists($column->options, 'encryption') &&
+                            $column->options->encryption === true
+                        ){
+                            $encrypted[] = $column->name;
+                            $is_encrypted = true;
+                        }
                         if($is_both){
                             $both = [];
                             if($is_encrypted){
@@ -221,14 +229,6 @@ class Schema extends Main
                             $both[] = '    return $this->get' . str_replace('.', '', Controller::name($column->name)) . '();';
                             $both[] = '}';
                             $data_functions[] = $both;
-                        }
-                        if(
-                            property_exists($column, 'options') &&
-                            property_exists($column->options, 'encryption') &&
-                            $column->options->encryption === true
-                        ){
-                            $encrypted[] = $column->name;
-                            $is_encrypted = true;
                         }
                         if($is_null){
                             if($type === 'mixed'){
