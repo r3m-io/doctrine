@@ -562,8 +562,16 @@ class Schema extends Main
                         $data[] = 'use ' . $usage . ';';
                     }
                 }
+                $repositoryClass = 'Repository\\' . $entity . 'Repository';
                 $data[] = '';
-                $data[] = '#[ORM\Entity]';
+                $data[] = '#[ORM\Entity(' .
+                    PHP_EOL .
+                    '    repositoryClass: "' .
+                    $repositoryClass .
+                    '"' .
+                    PHP_EOL .
+                    ')]'
+                ;
                 $data[] = '#[ORM\Table(name: "' . $table . '")]';
                 $data[] = '#[ORM\HasLifecycleCallbacks]';
                 $data[] = 'class ' . $entity . ' {';
