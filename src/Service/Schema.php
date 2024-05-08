@@ -176,6 +176,7 @@ class Schema extends Main
                             }
                             $data_columns[] = '#[ORM\column(' .
                                 PHP_EOL .
+                                '        ' .
                                 implode(
                                     ', ' .
                                     PHP_EOL .
@@ -184,6 +185,7 @@ class Schema extends Main
                                     $column_value
                                 ) .
                                 PHP_EOL .
+                                '    ' .
                                 ')]'
                             ;
                         }
