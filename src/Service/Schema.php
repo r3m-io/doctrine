@@ -379,10 +379,7 @@ class Schema extends Main
                                 $data_functions[] = $get;
                             }
                         } else {
-                            if($options_default_value !== null){
-                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = ' . $options_default_value . ';';
-                            }
-                            elseif(
+                            if(
                                 property_exists($column, 'options') &&
                                 property_exists($column->options, 'default') &&
                                 $column->options->default !== null
@@ -390,10 +387,17 @@ class Schema extends Main
                                 if($column->options->default_value = 'CURRENT_TIMESTAMP'){
                                     $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                                 } else {
-                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
+                                    if($options_default_value !== null){
+                                        if(is_numeric($options_default_value)){
+                                            $options_default_value = $options_default_value + 0;
+                                            $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = ' . $options_default_value . ';';
+                                        } else {
+                                            $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $options_default_value . '";';
+                                        }
+                                    }
+//                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
                                 }
-                            }
-                            else {
+                            } else {
                                 $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                             }
                             $data_columns[] = '';
