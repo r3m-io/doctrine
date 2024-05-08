@@ -514,7 +514,7 @@ class Schema extends Main
                     $data[] = '        $this->setIsCreated(new ' . $type_is_created .'());';
                 }
                 if($is_updated && $type_is_updated){
-                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .');';
+                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
                 }
                 $data[] = '    }';
                 $data[] = '';
@@ -541,7 +541,7 @@ class Schema extends Main
                     $data[] = '        }';
                 }
                 if($is_updated){
-                    $data[] = '        $this->setIsUpdated(new DateTime());';
+                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
                 }
                 $data[] = '    }';
 
