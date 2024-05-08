@@ -557,12 +557,12 @@ class Schema extends Main
                     $data[] = '    ' . $row;
                 }
                 $data[] = '';
-                $data[] = 'public function __construct()';
-                $data[] = '{';
+                $data[] = '    public function __construct()';
+                $data[] = '    {';
                 foreach($construct as $row){
-                    $data[] = '    ' . $row;
+                    $data[] = '        ' . $row;
                 }
-                $data[] = '}';
+                $data[] = '    }';
                 $data[] = '';
                 foreach ($data_functions as $set){
                     foreach($set as $row){
