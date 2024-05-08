@@ -161,7 +161,6 @@ class Schema extends Main
                                 property_exists($column->options, 'definition') &&
                                 is_string($column->options->definition)
                             ){
-                                ddd($column);
                                 $column_value .= ', columnDefinition: "' . $column->options->definition . '"';
                             }
                             $options_all = [];
