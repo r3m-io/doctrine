@@ -387,7 +387,7 @@ class Schema extends Main
                                 property_exists($column->options, 'default') &&
                                 $column->options->default !== null
                             ){
-                                if($column->options->default = 'CURRENT_TIMESTAMP'){
+                                if($column->options->default_value = 'CURRENT_TIMESTAMP'){
                                     $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                                 } else {
                                     $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
