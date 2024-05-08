@@ -172,7 +172,13 @@ class Schema extends Main
                             default :
                                 $type = 'string';
                                 break;
-
+                        }
+                        if($type === 'mixed'){
+                            $return_type = $type;
+                        } else if($is_null){
+                            $return_type = '?' . $type;
+                        } else {
+                            $return_type = $type;
                         }
                         if($is_both){
                             $both = [];
@@ -243,7 +249,7 @@ class Schema extends Main
                                     $get[] = '/**';
                                     $get[] = '* @throws Exception';
                                     $get[] = '*/';
-                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $return_type;
                                     $get[] = '{';
                                     $get[] = '    try {';
                                     $get[] = '        $object = $this->object();';
@@ -275,7 +281,7 @@ class Schema extends Main
                                     $get[] = '}';
                                 } else {
                                     $get = [];
-                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ?' . $type;
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $return_type;
                                     $get[] = '{';
                                     $get[] = '    return $this->' . $column->name . ';';
                                     $get[] = '}';
@@ -348,7 +354,7 @@ class Schema extends Main
                                     $get[] = '/**';
                                     $get[] = '* @throws Exception';
                                     $get[] = '*/';
-                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $return_type;
                                     $get[] = '{';
                                     $get[] = '    try {';
                                     $get[] = '        $object = $this->object();';
@@ -380,7 +386,7 @@ class Schema extends Main
                                     $get[] = '}';
                                 } else {
                                     $get = [];
-                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $type;
+                                    $get[] = 'public function get' . str_replace('.', '', Controller::name($column->name)) . '(): ' . $return_type;
                                     $get[] = '{';
                                     $get[] = '    return $this->' . $column->name . ';';
                                     $get[] = '}';
