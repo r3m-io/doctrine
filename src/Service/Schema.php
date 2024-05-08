@@ -48,6 +48,11 @@ class Schema extends Main
                 $encrypted = [];
                 $is_uuid = false;
                 $is_updated = false;
+                $is_created = false;
+                $is_deleted = false;
+                $type_is_created = null;
+                $type_is_updated = null;
+                $type_is_deleted = null;
                 if($columns && is_array($columns)){
                     foreach($columns as $nr => $column){
                         $is_set = true;
@@ -59,8 +64,14 @@ class Schema extends Main
                         if($column->name === 'uuid'){
                            $is_uuid = true;
                         }
+                        if($column->name === 'is_created'){
+                            $is_created = true;
+                        }
                         if($column->name === 'is_updated'){
                             $is_updated = true;
+                        }
+                        if($column->name === 'is_deleted'){
+                            $is_deleted = true;
                         }
                         if(
                             property_exists($column, 'options') &&
@@ -174,6 +185,15 @@ class Schema extends Main
                             default :
                                 $type = 'string';
                                 break;
+                        }
+                        if($type_is_created === null && $is_created){
+                            $type_is_created = $type;
+                        }
+                        if($type_is_updated === null && $is_updated){
+                            $type_is_updated = $type;
+                        }
+                        if($type_is_deleted === null && $is_deleted){
+                            $type_is_deleted = $type;
                         }
                         if($type === 'mixed'){
                             $return_type = $type;
@@ -304,7 +324,7 @@ class Schema extends Main
                                 $column->options->default !== null
                             ){
                                 if($column->options->default = 'CURRENT_TIMESTAMP'){
-                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = new ' . $type . '();';
+                                    $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                                 } else {
                                     $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = "' . $column->options->default . '";';
                                 }
@@ -481,12 +501,17 @@ class Schema extends Main
                 if($is_uuid){
                     $data[] = '        $this->setUuid(Core::uuid());';
                 }
+                if($is_created && $type_is_created){
+                    $data[] = '        $this->setIsCreated(new ' . $type_is_created .'());';
+                }
+                if($is_updated && $type_is_updated){
+                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .');';
+                }
                 $data[] = '    }';
                 $data[] = '';
                 $data[] = '    #[PreUpdate]';
                 $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
                 $data[] = '    {';
-
                 if(array_key_exists(0, $encrypted)){
                     $data[] = '        $object = $this->getObject();';
                     $data[] = '        if($object){';
