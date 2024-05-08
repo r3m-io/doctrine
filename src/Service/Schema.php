@@ -88,7 +88,6 @@ class Schema extends Main
                         ){
                             $column_value = 'type: "' . $column->type . '"';
                             $column_value .= ', name: "`' . $column->name . '`"';
-                            $is_null = false;
                             if(
                                 property_exists($column,'options') &&
                                 property_exists($column->options, 'unique') &&
