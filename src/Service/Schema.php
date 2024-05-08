@@ -24,7 +24,6 @@ class Schema extends Main
         if(!property_exists($options, 'url')){
             throw new Exception('Option, Url not set...');
         }
-        d($options->url);
         $read = $object->data_read($options->url);
         if($read){
             $has_schema = $read->has('Schema');
@@ -46,6 +45,7 @@ class Schema extends Main
                 $data_columns = [];
                 $data_functions = [];
                 $encrypted = [];
+                $construct = [];
                 $is_uuid = false;
                 $is_updated = false;
                 $is_created = false;
@@ -557,6 +557,13 @@ class Schema extends Main
                     $data[] = '    ' . $row;
                 }
                 $data[] = '';
+                $data[] = 'public function __construct()';
+                $data[] = '{';
+                foreach($construct as $row){
+                    $data[] = '    ' . $row;
+                }
+                $data[] = '}';
+                $data[] = '';
                 foreach ($data_functions as $set){
                     foreach($set as $row){
                         $data[] = '    ' . $row;
@@ -603,29 +610,9 @@ class Schema extends Main
                     $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
                 }
                 $data[] = '    }';
-
-                /*
-                 * #[PreUpdate]
-    public function preUpdate(PreUpdateEventArgs $args): void
-    {
-        $object = $this->getObject();
-        if($object){
-            if($this->is_body_decrypted === true){
-                $this->setBody($this->getBody());
-            }
-            if($this->is_subject_decrypted === true){
-                $this->setSubject($this->getSubject());
-            }
-            if($this->is_text_decrypted === true){
-                $this->setText($this->getText());
-            }
-        }
-        $this->setIsUpdated(new DateTime());
-    }
-                 */
-
                 $data[] = '}';
                 File::write($target, implode(PHP_EOL, $data));
+                echo 'Write: ' . $target . PHP_EOL;
             }
         }
     }
