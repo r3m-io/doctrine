@@ -155,6 +155,7 @@ class Schema extends Main
                                     $options_unsigned = '"unsigned" => true';
                                 }
                             }
+                            d($column->options ?? '');
                             if(
                                 property_exists($column, 'options') &&
                                 property_exists($column->options, 'definition') &&
