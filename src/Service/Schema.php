@@ -61,6 +61,7 @@ class Schema extends Main
                         $is_encrypted = false;
                         $is_null = false;
                         $options_default = null;
+                        $options_default_value = null;
                         $options_unsigned = null;
                         if($column->name === 'uuid'){
                            $is_uuid = true;
@@ -135,10 +136,11 @@ class Schema extends Main
                             ){
                                 if($column->options->default !== null){
                                     if(is_numeric($column->options->default)){
-                                        $options_default = $column->options->default + 0;
-                                        $options_default = '"default" => ' . $options_default;
+                                        $options_default_value = $column->options->default + 0;
+                                        $options_default = '"default" => ' . $options_default_value;
                                     } else {
-                                        $options_default = '"default" => "' .  $column->options->default . '"';
+                                        $options_default_value = $column->options->default;
+                                        $options_default = '"default" => "' .  $options_default_value . '"';
                                     }
                                 }
                             }
@@ -377,8 +379,8 @@ class Schema extends Main
                                 $data_functions[] = $get;
                             }
                         } else {
-                            if($options_default !== null){
-                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = ' . $options_default . ';';
+                            if($options_default_value !== null){
+                                $data_columns[] = 'protected ' . $type . ' $' . $column->name . ' = ' . $options_default_value . ';';
                             }
                             elseif(
                                 property_exists($column, 'options') &&
