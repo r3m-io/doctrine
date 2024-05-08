@@ -485,12 +485,12 @@ class Schema extends Main
                 $data[] = '#[ORM\HasLifecycleCallbacks]';
                 $data[] = 'class ' . $entity . ' {';
                 $data[] = '';
-                foreach($data_columns as $nr => $row){
+                foreach($data_columns as $row){
                     $data[] = '    ' . $row;
                 }
                 $data[] = '';
-                foreach ($data_functions as $nr => $set){
-                    foreach($set as $nr => $row){
+                foreach ($data_functions as $set){
+                    foreach($set as $row){
                         $data[] = '    ' . $row;
                     }
                     $data[] = '';
