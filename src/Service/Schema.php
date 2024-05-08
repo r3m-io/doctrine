@@ -519,13 +519,13 @@ class Schema extends Main
                 $data[] = '    }';
                 $data[] = '';
                 if(array_key_exists(0, $encrypted)){
-                    $data[] = '/**';
-                    $data[] = '* @throws WrongKeyOrModifiedCiphertextException';
-                    $data[] = '* @throws BadFormatException';
-                    $data[] = '* @throws FileWriteException';
-                    $data[] = '* @throws EnvironmentIsBrokenException';
-                    $data[] = '* @throws Exception';
-                    $data[] = '*/';
+                    $data[] = '    /**';
+                    $data[] = '    * @throws WrongKeyOrModifiedCiphertextException';
+                    $data[] = '    * @throws BadFormatException';
+                    $data[] = '    * @throws FileWriteException';
+                    $data[] = '    * @throws EnvironmentIsBrokenException';
+                    $data[] = '    * @throws Exception';
+                    $data[] = '    */';
                 }
                 $data[] = '    #[PreUpdate]';
                 $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
