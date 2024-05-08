@@ -73,7 +73,7 @@ class Schema extends Main
                         if(
                             property_exists($column, 'type')
                         ){
-                            $column_value = 'type: ' . $column->type;
+                            $column_value = 'type: "' . $column->type . '"';
                             $column_value .= ', name: "`' . $column->name . '`"';
                             $is_null = false;
                             if(
