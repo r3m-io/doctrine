@@ -103,18 +103,29 @@ trait Main {
         if(property_exists($options, 'force')){
             $is_force = $options->force;
         }
+        $node = new Node($object);
         if(
             property_exists($options, 'environment') &&
             is_array($options->environment)
         ){
             foreach($options->environment as $environment){
                 if(!Core::is_uuid($environment)){
-                    ddd($environment);
+                    $class = 'System.Doctrine.Environment';
+                    $role = $node->role_system();
+                    $record = $node->record(
+                        $class,
+                        $role,
+                        [
+                            'name' => $environment,
+                            'environment' => $object->config('framework.environment')
+                        ]
+                    );
+                    ddd($record);
                 }
             }
         }
         ddd($options);
-        $node = new Node($object);
+
         $class = 'System.Schema';
         $role = $node->role_system();
         $import = $node->import($class, $role, $options);
