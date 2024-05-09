@@ -103,6 +103,16 @@ trait Main {
         if(property_exists($options, 'force')){
             $is_force = $options->force;
         }
+        if(
+            property_exists($options, 'environment') &&
+            is_array($options->environment)
+        ){
+            foreach($options->environment as $environment){
+                if(!Core::is_uuid($environment)){
+                    ddd($environment);
+                }
+            }
+        }
         ddd($options);
         $node = new Node($object);
         $class = 'System.Schema';
