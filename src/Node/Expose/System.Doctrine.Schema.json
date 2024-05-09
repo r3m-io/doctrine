@@ -67,6 +67,71 @@
                         }
                     ]
                 },
+                "import": {
+                    "output": [
+                        {
+                            "role": "ROLE_SYSTEM",
+                            "property": [
+                                "uuid",
+                                "#class",
+                                "table",
+                                "entity",
+                                "column",
+                                "primary_key",
+                                "index",
+                                "environment"
+                            ],
+                            "object": {
+                                "column": {
+                                    "multiple": true,
+                                    "output": [
+                                        "name",
+                                        "type",
+                                        "options"
+                                    ],
+                                    "object": {
+                                        "options": {
+                                            "multiple": false,
+                                            "output": [
+                                                "id",
+                                                "unsigned",
+                                                "autoincrement",
+                                                "unique",
+                                                "nullable",
+                                                "default",
+                                                "length",
+                                                "precision",
+                                                "scale",
+                                                "cascade",
+                                                "map",
+                                                "target",
+                                                "join"
+                                            ],
+                                            "object": {
+                                                "join": {
+                                                    "multiple": false,
+                                                    "output": [
+                                                        "table",
+                                                        "column"
+                                                    ],
+                                                    "object": {
+                                                        "column": {
+                                                            "multiple": true,
+                                                            "output": [
+                                                                "name",
+                                                                "reference"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
                 "create": {
                     "output": [
                         {
