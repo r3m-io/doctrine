@@ -116,8 +116,10 @@ trait Main {
                         $class,
                         $role,
                         [
-                            'name' => $environment,
-                            'environment' => $object->config('framework.environment')
+                            'filter' => [
+                                'name' => $environment,
+                                'environment' => $object->config('framework.environment')
+                            ]
                         ]
                     );
                     ddd($record);
