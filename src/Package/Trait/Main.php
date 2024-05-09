@@ -5,6 +5,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use R3m\Io\Config;
 
+use R3m\Io\Module\Core;
 use R3m\Io\Module\File;
 use R3m\Io\Node\Model\Node;
 
@@ -88,4 +89,27 @@ trait Main {
             'url_target' => $url_target,
         ]);
     }
+
+    /**
+     * @throws Exception
+     */
+    public function schema_import($flags=null, $options=null): void
+    {
+        $object = $this->object();
+        $is_force = false;
+        if(!property_exists($options, 'url')){
+            throw new Exception('Url not set...');
+        }
+        if(property_exists($options, 'force')){
+            $is_force = $options->force;
+        }
+        ddd($options);
+        $node = new Node($object);
+        $class = 'System.Schema';
+        $role = $node->role_system();
+        $import = $node->import($class, $role, $options);
+        ddd($import);
+    }
+
+
 }
