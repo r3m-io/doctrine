@@ -152,9 +152,11 @@ trait Main {
                 }
             }
         }
-        ddd($options);
-
-        $class = 'System.Schema';
+        //default value for each import
+        $options->default = (object) [
+            'environment' => $options->environment
+        ];
+        $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
         $import = $node->import($class, $role, $options);
         ddd($import);
