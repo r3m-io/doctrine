@@ -153,8 +153,11 @@ trait Main {
             }
         }
         //default value for each import
-        $options->default = (object) [
-            'environment' => $options->environment
+        // system.doctrine.environment is user input
+        $options->node = (object) [
+            'default' => (object) [
+                'environment' => $options->environment
+            ]
         ];
         $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
