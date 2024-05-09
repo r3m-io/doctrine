@@ -108,7 +108,7 @@ trait Main {
             property_exists($options, 'environment') &&
             is_array($options->environment)
         ){
-            foreach($options->environment as $environment){
+            foreach($options->environment as $nr => $environment){
                 if(!Core::is_uuid($environment)){
                     $class = 'System.Doctrine.Environment';
                     $role = $node->role_system();
@@ -122,7 +122,33 @@ trait Main {
                             ]
                         ]
                     );
-                    ddd($record);
+                    if(
+                        $record &&
+                        array_key_exists('node', $record) &&
+                        property_exists($record['node'], 'uuid')
+                    ){
+                        $options->environment[$nr] = $record['node']->uuid;
+                    } else {
+                        $record = $node->record(
+                            $class,
+                            $role,
+                            [
+                                'filter' => [
+                                    'name' => $environment,
+                                    'environment' => '*'
+                                ]
+                            ]
+                        );
+                        if(
+                            $record &&
+                            array_key_exists('node', $record) &&
+                            property_exists($record['node'], 'uuid')
+                        ){
+                            $options->environment[$nr] = $record['node']->uuid;
+                        } else {
+                            throw new Exception('Environment not found...');
+                        }
+                    }
                 }
             }
         }
