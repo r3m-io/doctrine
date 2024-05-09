@@ -162,6 +162,86 @@
     {
       "name": "System:Doctrine:Environment:rename",
       "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:import",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:record",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:record.relation",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:create",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:create.many",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:count",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:count.relation",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:commit",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:read",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:read.relation",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:put",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:put.many",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:patch",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:patch.many",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:page",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:page.relation",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:property.delete",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:list",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:list.relation",
+      "#class": "Account.Permission"
+    },
+    {
+      "name": "System:Doctrine:Schema:rename",
+      "#class": "Account.Permission"
     }
   ]
 }
