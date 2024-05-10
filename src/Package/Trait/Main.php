@@ -104,7 +104,6 @@ trait Main {
             $is_force = $options->force;
         }
         $node = new Node($object);
-        ddd($options);
         if(
             property_exists($options, 'environment') &&
             is_array($options->environment)
