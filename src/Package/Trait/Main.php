@@ -139,7 +139,6 @@ trait Main {
                                 ]
                             ]
                         );
-                        ddd($record);
                         if(
                             $record &&
                             array_key_exists('node', $record) &&
@@ -153,6 +152,10 @@ trait Main {
                 }
             }
         }
+        if(!property_exists($options, 'environment')){
+            throw new Exception('System.Doctrine.Environment not set... use option -environment[]');
+        }
+
         //default value for each import
         // system.doctrine.environment is user input
         $options->node = (object) [
