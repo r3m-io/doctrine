@@ -98,14 +98,21 @@ trait Main {
         $object = $this->object();
         $is_force = false;
         if(!property_exists($options, 'url')){
-            throw new Exception('Url not set...');
+            throw new Exception('Option: url not set...');
+        }
+        if(!property_exists($options, 'environment')){
+            throw new Exception('Option: environment not set...');
         }
         if(property_exists($options, 'force')){
             $is_force = $options->force;
         }
         $node = new Node($object);
         if(
-            property_exists($options, 'environment') &&
+            is_string($options->environment)
+        ){
+            $options->environment = [$options->environment];
+        }
+        if(
             is_array($options->environment)
         ){
             foreach($options->environment as $nr => $environment){
