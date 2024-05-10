@@ -156,7 +156,7 @@ trait Main {
         // system.doctrine.environment is user input
         $options->node = (object) [
             'default' => (object) [
-                'environment' => $options->environment ?? null
+                'environment' => $options->environment
             ]
         ];
         $class = 'System.Doctrine.Schema';
