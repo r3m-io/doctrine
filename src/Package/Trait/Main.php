@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use R3m\Io\Config;
 
 use R3m\Io\Module\Core;
+use R3m\Io\Module\Event;
 use R3m\Io\Module\File;
 use R3m\Io\Node\Model\Node;
 
@@ -170,6 +171,44 @@ trait Main {
             property_exists($options, 'event') &&
             $options->event === true
         ){
+
+            $actions = [
+                'create',
+                'patch',
+                'put'
+            ];
+            $events =[];
+
+            foreach($actions as $action){
+                $events[] = (object) [
+                    '#class' => 'System.Event',
+                    'action' => 'r3m.io.node.' . $action,
+                    'options' => (object) [
+                        'priority' => 10,
+                        'command' => [],
+                        'controller' => [
+                            'Event:R3m:Io:Doctrine:Schema:create'
+                        ]
+                    ]
+                ];
+            }
+            $action = 'delete';
+            $events[] = (object) [
+                '#class' => 'System.Event',
+                'action' => 'r3m.io.node.' . $action,
+                'options' => (object) [
+                    'priority' => 10,
+                    'command' => [],
+                    'controller' => [
+                        'Event:R3m:Io:Doctrine:Schema:' . $action
+                    ]
+                ]
+            ];
+            Event::on($object, $events);
+
+//            Doctrine\ORM\Tools\SchemaTool::getSchemaFromMetadata(array $classes): Schema
+
+
             //load events for:
             // move events to the import url json file
             // - r3m.io.node.create (schema) -> create entity, create table(s)

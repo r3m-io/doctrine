@@ -12,6 +12,18 @@ class Schema extends Main
 {
 
     /**
+     * class entity::schema
+     *
+     * $schemaTool = new SchemaTool($entityManager);
+
+    $metadata = [$entityManager->getClassMetadata(YourEntity::class)];
+
+    // Create the schema
+    $schemaTool->createSchema($metadata);
+     *
+     */
+
+    /**
      * @throws Exception
      */
     public static function entity(App $object, $options): void
