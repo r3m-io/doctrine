@@ -4,6 +4,7 @@ namespace R3m\Io\Doctrine\Service;
 use R3m\Io\App;
 
 use Exception;
+use R3m\Io\Module\Data;
 use R3m\Io\Module\Controller;
 use R3m\Io\Module\File;
 
@@ -15,19 +16,48 @@ class Schema extends Main
      * class entity::schema
      *
      * $schemaTool = new SchemaTool($entityManager);
-
-    $metadata = [$entityManager->getClassMetadata(YourEntity::class)];
-
-    // Create the schema
-    $schemaTool->createSchema($metadata);
      *
+     * $metadata = [$entityManager->getClassMetadata(YourEntity::class)];
+     *
+     * // Create the schema
+     * $schemaTool->createSchema($metadata);
+     *
+     * @throws Exception
      */
 
     public static function entity(App $object, $class, $role, $node, $options=[]): void
     {
-        d($class);
-        d(count($role->permission));
-        ddd(get_class($node));
+        if(is_object($node)){
+            $node_class = get_class($node);
+            switch($node_class){
+                case 'stdClass':
+                    $node = new Data($node);
+                    break;
+                default:
+                    throw new Exception('unknown node class: ' . $node_class);
+            }
+        }
+        elseif(is_array($node)){
+            $node = new Data($node);
+        } else {
+            return;
+        }
+
+        $has_schema = $node->has('Schema');
+        if($has_schema) {
+            $table = $node->get('Schema.table');
+            $entity = $node->get('Schema.entity');
+            $target = $object->config('project.dir.source') .
+                'Entity' .
+                $object->config('ds') .
+                $entity .
+                $object->config('extension.php')
+            ;
+            d($table);
+            d($entity);
+            d($target);
+        }
+        ddd($node);
     }
 
 
