@@ -432,7 +432,6 @@ class Schema extends Main
                         } else {
                             $data_columns[] = 'protected ' . $type . ' $' . $column->name . ';';
                         }
-                        $data_columns[] = '';
                         if($is_set){
                             if($is_encrypted){
                                 $set = [];
