@@ -25,6 +25,8 @@ class Schema extends Main
 
     public static function entity(App $object, $class, $role, $node, $options=[]): void
     {
+        d($class);
+        d(count($role->permission));
         ddd(get_class($node));
     }
 
