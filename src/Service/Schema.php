@@ -43,10 +43,10 @@ class Schema extends Main
             return;
         }
 
-        $has_schema = $node->has('Schema');
+        $has_schema = $node->has('System.Doctrine.Schema');
         if($has_schema) {
-            $table = $node->get('Schema.table');
-            $entity = $node->get('Schema.entity');
+            $table = $node->get('System.Doctrine.Schema.table');
+            $entity = $node->get('System.Doctrine.Schema.entity');
             $target = $object->config('project.dir.source') .
                 'Entity' .
                 $object->config('ds') .
