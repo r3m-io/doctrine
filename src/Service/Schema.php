@@ -1343,16 +1343,16 @@ class Schema extends Main
             ;
             if(!File::exist($target)){
                 $data = [];
-                $data[] '<?php';
-                $data[] '';
-                $data[] 'namespace Repository;';
-                $data[] '';
-                $data[] 'use Doctrine\ORM\EntityRepository;';
-                $data[] '';
-                $data[] 'class ' . $repository . ' extends EntityRepository';
-                $data[] '{';
-                $data[] '';
-                $data[] '}';
+                $data[] = '<?php';
+                $data[] = '';
+                $data[] = 'namespace Repository;';
+                $data[] = '';
+                $data[] = 'use Doctrine\ORM\EntityRepository;';
+                $data[] = '';
+                $data[] = 'class ' . $repository . ' extends EntityRepository';
+                $data[] = '{';
+                $data[] = '';
+                $data[] = '}';
                 File::write($target, implode(PHP_EOL, $data));
                 echo 'Write: ' . $target . PHP_EOL;
             }
