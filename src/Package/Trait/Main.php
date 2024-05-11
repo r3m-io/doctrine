@@ -169,6 +169,7 @@ trait Main {
         $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
         $import = $node->import($class, $role, $options);
+        d($options);
         ddd($import);
     }
 
