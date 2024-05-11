@@ -590,7 +590,19 @@ class Schema extends Main
                 ')]'
             ;
             $data[] = '#[ORM\Table(name: "' . $table . '")]';
-            $data[] = '#[ORM\HasLifecycleCallbacks]';
+            if (
+                $is_uuid ||
+                (
+                    $is_created  && $type_is_created
+                ) ||
+                (
+                    $is_updated && $type_is_updated
+                ) ||
+                array_key_exists(0, $encrypted) ||
+                $is_updated
+            ){
+                $data[] = '#[ORM\HasLifecycleCallbacks]';
+            }
             $data[] = 'class ' . $entity . ' {';
             $data[] = '';
             foreach($data_columns as $row){
@@ -610,47 +622,62 @@ class Schema extends Main
                 }
                 $data[] = '';
             }
-            $data[] = '    #[PrePersist]';
-            $data[] = '    public function prePersist(PrePersistEventArgs $args): void';
-            $data[] = '    {';
-            if($is_uuid){
-                $data[] = '        $this->setUuid(Core::uuid());';
-            }
-            if($is_created && $type_is_created){
-                $data[] = '        $this->setIsCreated(new ' . $type_is_created .'());';
-            }
-            if($is_updated && $type_is_updated){
-                $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
-            }
-            $data[] = '    }';
-            $data[] = '';
-            if(array_key_exists(0, $encrypted)){
-                $data[] = '    /**';
-                $data[] = '    * @throws WrongKeyOrModifiedCiphertextException';
-                $data[] = '    * @throws BadFormatException';
-                $data[] = '    * @throws FileWriteException';
-                $data[] = '    * @throws EnvironmentIsBrokenException';
-                $data[] = '    * @throws Exception';
-                $data[] = '    */';
-            }
-            $data[] = '    #[PreUpdate]';
-            $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
-            $data[] = '    {';
-            if(array_key_exists(0, $encrypted)){
-                $data[] = '        $object = $this->getObject();';
-                $data[] = '        if($object){';
-                foreach($encrypted as $nr => $column){
-                    $data[] = '            if($this->is_encrypted_' . strtolower($column) . ' === false){';
-                    $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
-                    $data[] = '            }';
+            if (
+                $is_uuid ||
+                (
+                    $is_created  && $type_is_created
+                ) ||
+                (
+                    $is_updated && $type_is_updated
+                )
+            ){
+                $data[] = '    #[PrePersist]';
+                $data[] = '    public function prePersist(PrePersistEventArgs $args): void';
+                $data[] = '    {';
+                if($is_uuid){
+                    $data[] = '        $this->setUuid(Core::uuid());';
                 }
-                $data[] = '        }';
+                if($is_created && $type_is_created){
+                    $data[] = '        $this->setIsCreated(new ' . $type_is_created .'());';
+                }
+                if($is_updated && $type_is_updated){
+                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
+                }
+                $data[] = '    }';
+                $data[] = '';
             }
-            if($is_updated){
-                $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
+            if(
+                array_key_exists(0, $encrypted) ||
+                $is_updated
+            ){
+                if(array_key_exists(0, $encrypted)){
+                    $data[] = '    /**';
+                    $data[] = '    * @throws WrongKeyOrModifiedCiphertextException';
+                    $data[] = '    * @throws BadFormatException';
+                    $data[] = '    * @throws FileWriteException';
+                    $data[] = '    * @throws EnvironmentIsBrokenException';
+                    $data[] = '    * @throws Exception';
+                    $data[] = '    */';
+                }
+                $data[] = '    #[PreUpdate]';
+                $data[] = '    public function preUpdate(PreUpdateEventArgs $args): void';
+                $data[] = '    {';
+                if(array_key_exists(0, $encrypted)){
+                    $data[] = '        $object = $this->getObject();';
+                    $data[] = '        if($object){';
+                    foreach($encrypted as $nr => $column){
+                        $data[] = '            if($this->is_encrypted_' . strtolower($column) . ' === false){';
+                        $data[] = '                $this->set' . str_replace('.', '', Controller::name($column)) . '($this->get' . str_replace('.', '', Controller::name($column)) . '());';
+                        $data[] = '            }';
+                    }
+                    $data[] = '        }';
+                }
+                if($is_updated){
+                    $data[] = '        $this->setIsUpdated(new ' . $type_is_updated .'());';
+                }
+                $data[] = '    }';
+                $data[] = '}';
             }
-            $data[] = '    }';
-            $data[] = '}';
             File::write($target, implode(PHP_EOL, $data));
             echo 'Write: ' . $target . PHP_EOL;
         }
