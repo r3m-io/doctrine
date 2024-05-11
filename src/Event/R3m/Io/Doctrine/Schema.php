@@ -19,9 +19,6 @@ class Schema {
      */
     public static function create(App $object, $event, $options=[]): void
     {
-        d($event);
-        d($options);
-
         SchemaService::entity($object,
             $options['class'],
             $options['role'],

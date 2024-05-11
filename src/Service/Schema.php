@@ -828,7 +828,6 @@ class Schema extends Main
                                     $options_unsigned = '"unsigned" => true';
                                 }
                             }
-                            d($column->options ?? '');
                             if(
                                 property_exists($column, 'options') &&
                                 property_exists($column->options, 'definition') &&
@@ -1309,6 +1308,41 @@ class Schema extends Main
                 File::write($target, implode(PHP_EOL, $data));
                 echo 'Write: ' . $target . PHP_EOL;
             }
+        }
+    }
+
+    /*
+    * @throws Exception
+    */
+    public static function repository(App $object, $class, $role, $node, $options=[]): void
+    {
+        if(is_object($node)){
+            $node_class = get_class($node);
+            switch($node_class){
+                case 'stdClass':
+                    $node = new Data($node);
+                    break;
+                default:
+                    throw new Exception('unknown node class: ' . $node_class);
+            }
+        }
+        elseif(is_array($node)){
+            $node = new Data($node);
+        } else {
+            return;
+        }
+        if($node->has('table')) {
+            $table = $node->get('table');
+            $entity = $node->get('entity');
+            $target = $object->config('project.dir.source') .
+                'Entity' .
+                $object->config('ds') .
+                $entity .
+                $object->config('extension.php')
+            ;
+            d($table);
+            d($entity);
+            d($target);
         }
     }
 
