@@ -166,6 +166,7 @@ trait Main {
                 'environment' => $options->environment
             ]
         ];
+        ddd($options);
         $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
         $import = $node->import($class, $role, $options);
