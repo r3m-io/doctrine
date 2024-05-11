@@ -166,6 +166,17 @@ trait Main {
                 'environment' => $options->environment
             ]
         ];
+        if(
+            property_exists($options, 'event') &&
+            $options->event === true
+        ){
+            //load events for:
+            // - r3m.io.node.create (schema) -> create entity, create table(s)
+            // - r3m.io.node.patch (schema) -> create entity, patch table(s)
+            // - r3m.io.node.put (schema) -> create entity, patch table(s)
+            // - r3m.io.node.delete (schema) -> delete entity, drop table(s)
+            ddd($object);
+        }
         ddd($options);
         $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
