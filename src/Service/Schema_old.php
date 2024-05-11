@@ -7,7 +7,7 @@ use Exception;
 use R3m\Io\Module\Controller;
 use R3m\Io\Module\File;
 
-class Schema extends Main
+class Schema_old extends Main
 
 {
 
@@ -23,17 +23,10 @@ class Schema extends Main
      *
      */
 
-    public static function entity(App $object, $class, $role, $node, $options=[]): void
-    {
-        ddd(get_class($node));
-    }
-
-
     /**
      * @throws Exception
      */
-
-    public static function entity_old(App $object, $options): void
+    public static function entity(App $object, $options): void
     {
         /*
         if(!property_exists($options, 'platform')){

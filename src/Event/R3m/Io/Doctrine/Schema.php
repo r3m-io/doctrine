@@ -8,6 +8,8 @@ use R3m\Io\Config;
 use R3m\Io\Module\File;
 use R3m\Io\Module\Parse;
 
+use R3m\Io\Doctrine\Service\Schema as SchemaService;
+
 use Exception;
 
 class Schema {
@@ -19,6 +21,25 @@ class Schema {
     {
         d($event);
         d($options);
+
+        SchemaService::entity($object,
+            $options['class'],
+            $options['role'],
+            $options['node']
+        );
+
+
+
+        /**
+         * options = [
+         *  'class',
+         *  'node',
+         *  'options',
+         *  'role' => check permission to create schema
+         * ]
+         */
+
+
         return;
         if($object->config(Config::POSIX_ID) !== 0){
             return;
