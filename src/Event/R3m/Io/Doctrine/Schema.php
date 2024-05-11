@@ -27,7 +27,11 @@ class Schema {
             $options['role'],
             $options['node']
         );
-
+        SchemaService::repository($object,
+            $options['class'],
+            $options['role'],
+            $options['node']
+        );
 
 
         /**

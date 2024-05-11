@@ -173,7 +173,6 @@ class Schema extends Main
                                 $options_unsigned = '"unsigned" => true';
                             }
                         }
-                        d($column->options ?? '');
                         if(
                             property_exists($column, 'options') &&
                             property_exists($column->options, 'definition') &&
@@ -680,7 +679,6 @@ class Schema extends Main
             File::write($target, implode(PHP_EOL, $data));
             echo 'Write: ' . $target . PHP_EOL;
         }
-        ddd($node);
     }
 
 
