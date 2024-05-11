@@ -171,6 +171,7 @@ trait Main {
             $options->event === true
         ){
             //load events for:
+            // move events to the import url json file
             // - r3m.io.node.create (schema) -> create entity, create table(s)
             // - r3m.io.node.patch (schema) -> create entity, patch table(s)
             // - r3m.io.node.put (schema) -> create entity, patch table(s)
