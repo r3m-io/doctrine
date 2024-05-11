@@ -1334,15 +1334,19 @@ class Schema extends Main
         if($node->has('table')) {
             $table = $node->get('table');
             $entity = $node->get('entity');
+            $repository = $entity .  'Repository';
             $target = $object->config('project.dir.source') .
-                'Entity' .
+                'Repository' .
                 $object->config('ds') .
-                $entity .
+                $repository .
                 $object->config('extension.php')
             ;
-            d($table);
-            d($entity);
-            d($target);
+            if(!File::exist($target)){
+                $data = [];
+                d($table);
+                d($entity);
+                d($target);
+            }
         }
     }
 
