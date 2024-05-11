@@ -205,19 +205,14 @@ trait Main {
                 ]
             ];
             Event::on($object, $events);
-
 //            Doctrine\ORM\Tools\SchemaTool::getSchemaFromMetadata(array $classes): Schema
-
-
             //load events for:
             // move events to the import url json file
             // - r3m.io.node.create (schema) -> create entity, create table(s)
             // - r3m.io.node.patch (schema) -> create entity, patch table(s)
             // - r3m.io.node.put (schema) -> create entity, patch table(s)
             // - r3m.io.node.delete (schema) -> delete entity, drop table(s)
-            ddd($object);
         }
-        ddd($options);
         $class = 'System.Doctrine.Schema';
         $role = $node->role_system();
         $import = $node->import($class, $role, $options);
