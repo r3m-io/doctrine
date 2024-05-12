@@ -168,6 +168,10 @@
       "#class": "Account.Permission"
     },
     {
+      "name": "System:Doctrine:Schema:import.relation",
+      "#class": "Account.Permission"
+    },
+    {
       "name": "System:Doctrine:Schema:record",
       "#class": "Account.Permission"
     },
