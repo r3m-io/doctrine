@@ -46,6 +46,29 @@ class Table extends Main
 
 {
 
+    public static function has(App $object, $class, $role, $node, $options=[]): bool
+    {
+        $name ='raxon.2024.05.11';
+        $environment = '*';
+        Database::instance($object, $name, $environment);
+        $tables = Database::tables($object, $name, $environment);
+
+
+
+
+        if (in_array($tableName, $tables)) {
+            echo "Table exists.";
+        } else {
+            echo "Table does not exist.";
+        }
+        /*
+        if(!property_exists($options, 'platform')){
+            throw new Exception('Option, Platform not set...');
+        }
+        */
+    }
+
+
     /**
      * @throws Exception
      * @throws \Doctrine\DBAL\Exception

@@ -171,7 +171,6 @@ trait Main {
             property_exists($options, 'event') &&
             $options->event === true
         ){
-
             $actions = [
                 'create',
                 'patch',
