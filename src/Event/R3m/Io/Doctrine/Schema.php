@@ -20,7 +20,6 @@ class Schema {
      */
     public static function create(App $object, $event, $options=[]): void
     {
-        ddd($options);
         //if exist rename table
 
         if(

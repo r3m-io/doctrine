@@ -48,6 +48,7 @@ class Table extends Main
 
     public static function has(App $object, $class, $role, $node, $options=[]): bool
     {
+        d($options);
         ddd($node);
         $name ='raxon.2024.05.11';
         $environment = '*';
