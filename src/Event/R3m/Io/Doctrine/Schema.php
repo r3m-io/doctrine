@@ -22,51 +22,67 @@ class Schema {
     {
         ddd($options);
         //if exist rename table
-        $is_rename = false;
-        $table = null;
+
         if(
-            Table::has(
-                $object,
-                $options['class'],
-                $options['role'],
-                $options['node'],
-                [
-                    'platform' => $options['platform']
-                ]
+            property_exists($options, 'node') &&
+            property_exists($options->node, 'environment') &&
+            (
+                is_array($options->node->environment) ||
+                is_object($options->node->environment)
             )
         ) {
-            $table = Table::rename(
-                $object,
-                $options['class'],
-                $options['role'],
-                $options['node']
-            );
-            ddd($table);
-            $is_rename = true;
+            foreach($options->node->environment as $name => $environment){
+                $is_rename = false;
+                $table = null;
+                if(
+                    Table::has(
+                        $object,
+                        $options['class'],
+                        $options['role'],
+                        $options['node'],
+                        [
+                            'environment' => $environment
+                        ]
+                    )
+                ) {
+                    $table = Table::rename(
+                        $object,
+                        $options['class'],
+                        $options['role'],
+                        $options['node']
+                    );
+                    ddd($table);
+                    $is_rename = true;
+                }
+                SchemaService::entity($object,
+                    $options['class'],
+                    $options['role'],
+                    $options['node']
+                );
+                //only create repository class if not exist, resetting means deleting the repository class and rerun this event
+                SchemaService::repository($object,
+                    $options['class'],
+                    $options['role'],
+                    $options['node']
+                );
+                if(
+                    $is_rename &&
+                    $table
+                ){
+                    Table::import(
+                        $object,
+                        $options['class'],
+                        $options['role'],
+                        $options['node'],
+                        $table
+                    );
+                }
+            }
         }
-        SchemaService::entity($object,
-            $options['class'],
-            $options['role'],
-            $options['node']
-        );
-        //only create repository class if not exist, resetting means deleting the repository class and rerun this event
-        SchemaService::repository($object,
-            $options['class'],
-            $options['role'],
-            $options['node']
-        );
-        if(
-            $is_rename &&
-            $table
-        ){
-            Table::import(
-                $object,
-                $options['class'],
-                $options['role'],
-                $options['node'],
-                $table
-            );
-        }
+
+
+
+
         //if exist rename table
         //import data from rename table in to new table
 

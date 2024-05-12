@@ -48,6 +48,7 @@ class Table extends Main
 
     public static function has(App $object, $class, $role, $node, $options=[]): bool
     {
+        ddd($node);
         $name ='raxon.2024.05.11';
         $environment = '*';
         Database::instance($object, $name, $environment);
