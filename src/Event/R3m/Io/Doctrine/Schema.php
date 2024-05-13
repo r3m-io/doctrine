@@ -21,6 +21,7 @@ class Schema {
     public static function create(App $object, $event, $options=[]): void
     {
         //if exist rename table
+        d($options);
         if(
             array_key_exists('node', $options) &&
             property_exists($options['node'], 'environment') &&
