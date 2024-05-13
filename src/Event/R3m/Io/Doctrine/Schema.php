@@ -23,6 +23,8 @@ class Schema {
         //if exist rename table
 //        d($options);
         $node = false;
+        $is_entity = false;
+        $is_repository = false;
         if(array_key_exists('node', $options)){
             $node = $options['node'];
 
@@ -33,6 +35,41 @@ class Schema {
                 ){
                     foreach($node->environment as $name => $config){
                         $config->table = Table::all($object, $config->name, $config->environment);
+                        if(in_array($node->table, $config->table, true)){
+                            $table = Table::rename(
+                                $object,
+                                $options['class'],
+                                $options['role'],
+                                $options['node']
+                            );
+                            ddd($table);
+                            $is_rename = true;
+                            /*
+                            Table::rename($object, $config->name, $config->environment);
+                            Table::import($object, $config->name, $config->environment, $config->table);
+                            */
+                        } else {
+                            if($is_entity === false){
+                                SchemaService::entity($object,
+                                    $options['class'],
+                                    $options['role'],
+                                    $options['node']
+                                );
+                                $is_entity = true;
+                            }
+                            if($is_repository === false){
+                                //only create repository class if not exist, resetting means deleting the repository class and rerun this event
+                                SchemaService::repository($object,
+                                    $options['class'],
+                                    $options['role'],
+                                    $options['node']
+                                );
+                                $is_repository = true;
+                            }
+                            ddd('create table');
+
+//                            Table::import($object, $config->name, $config->environment, $config->table);
+                        }
                         d($name);
                         d($config);
                     }
