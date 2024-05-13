@@ -53,28 +53,21 @@ class Table extends Main
         if($schema_manager){
             $tables = $schema_manager->listTableNames();
         }
+        d($tables);
         return $tables;
     }
 
     public static function has(App $object, $class, $role, $node, $options=[]): bool
     {
-        ddd($options);
-        Database::instance($object, $options['environment']->name, $options['environment']->environment);
-        $tables = Database::tables($object, $options['environment']->name, $options['environment']->environment);
-        ddd($tables);
-
-
-
-        if (in_array($tableName, $tables)) {
-            echo "Table exists.";
-        } else {
-            echo "Table does not exist.";
+        if(array_key_exists('environment', $options)){
+            $config = $options['environment'];
+            Database::instance($object, $config->name, $config->environment);
+            $tables = Database::tables($object, $config->name, $config->environment);
+            if(in_array($node->table, $tables)){
+                return true;
+            }
         }
-        /*
-        if(!property_exists($options, 'platform')){
-            throw new Exception('Option, Platform not set...');
-        }
-        */
+        return false;
     }
 
 
