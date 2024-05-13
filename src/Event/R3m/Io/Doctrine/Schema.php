@@ -21,15 +21,13 @@ class Schema {
     public static function create(App $object, $event, $options=[]): void
     {
         //if exist rename table
-        d($options);
-        if(
-            array_key_exists('node', $options) &&
-            property_exists($options['node'], 'environment') &&
-            (
-                is_array($options['node']->environment) ||
-                is_object($options['node']->environment)
-            )
-        ) {
+//        d($options);
+        $node = false;
+        if(array_key_exists('node', $options)){
+            $node = $options['node'];
+            ddd($node->environment);
+        }
+        /*
             foreach($options['node']->environment as $name => $environment){
                 $is_rename = false;
                 $table = null;
@@ -78,7 +76,7 @@ class Schema {
                 }
             }
         }
-
+        */
 
 
 
