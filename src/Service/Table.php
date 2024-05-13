@@ -46,8 +46,19 @@ class Table extends Main
 
 {
 
+    public static function all($object, $name, $environment=null){
+        Database::instance($object, $name, $environment);
+        $schema_manager = Database::schema_manager($object, $name, $environment);
+        $tables = [];
+        if($schema_manager){
+            $tables = $schema_manager->listTableNames();
+        }
+        return $tables;
+    }
+
     public static function has(App $object, $class, $role, $node, $options=[]): bool
     {
+        ddd($options);
         Database::instance($object, $options['environment']->name, $options['environment']->environment);
         $tables = Database::tables($object, $options['environment']->name, $options['environment']->environment);
         ddd($tables);
