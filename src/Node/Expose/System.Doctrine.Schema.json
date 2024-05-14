@@ -40,7 +40,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -105,7 +106,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -170,7 +172,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -235,7 +238,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -300,7 +304,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -365,7 +370,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -430,7 +436,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -495,7 +502,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
@@ -560,7 +568,8 @@
                                                 "cascade",
                                                 "map",
                                                 "target",
-                                                "join"
+                                                "join",
+                                                "definition"
                                             ],
                                             "object": {
                                                 "join": {
