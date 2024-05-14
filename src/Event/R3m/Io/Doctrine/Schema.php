@@ -17,6 +17,7 @@ class Schema {
 
     /**
      * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public static function create(App $object, $event, $options=[]): void
     {
@@ -33,12 +34,9 @@ class Schema {
                     is_array($node->environment) ||
                     is_object($node->environment)
                 ){
-                    d($node->environment);
                     foreach($node->environment as $name => $environments){
                         foreach($environments as $environment => $config){
-                            d('yes');
                             $config->table = Table::all($object, $config->name, $config->environment);
-                            d($config);
                             if(in_array($node->table, $config->table, true)){
                                 $table = Table::rename(
                                     $object,
