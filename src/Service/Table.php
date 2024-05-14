@@ -47,6 +47,8 @@ class Table extends Main
 {
 
     public static function all($object, $name, $environment=null){
+        $name = str_replace('.', '-', $name);
+        $environment = str_replace('.', '-', $environment);
         Database::instance($object, $name, $environment);
         $schema_manager = Database::schema_manager($object, $name, $environment);
         $tables = [];
