@@ -38,8 +38,7 @@ class Column extends Main
                 $list = [];
                 foreach($columns as $column){
                     $record = $column->toArray();
-                    ddd($column);
-                    $record['type'] = (string) $column->getType()->getBindingType();
+                    $record['type'] = get_class($column->getType());
                     $list[]= $record;
                 }
                 d($list);
