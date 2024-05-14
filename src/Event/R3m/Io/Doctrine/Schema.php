@@ -36,6 +36,7 @@ class Schema {
                     d($node->environment);
                     foreach($node->environment as $name => $config){
                         $config->table = Table::all($object, $config->name, $config->environment);
+                        d($config);
                         if(in_array($node->table, $config->table, true)){
                             $table = Table::rename(
                                 $object,
@@ -68,6 +69,7 @@ class Schema {
                                 $is_repository = true;
                             }
                             $platform = Database::platform($object, $config->name, $config->environment);
+                            d($platform);
                             if($platform){
                                 d('has platform');
                                 SchemaService::sql($object,
