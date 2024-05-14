@@ -34,58 +34,60 @@ class Schema {
                     is_object($node->environment)
                 ){
                     d($node->environment);
-                    foreach($node->environment as $name => $config){
-                        $config->table = Table::all($object, $config->name, $config->environment);
-                        d($config);
-                        if(in_array($node->table, $config->table, true)){
-                            $table = Table::rename(
-                                $object,
-                                $options['class'],
-                                $options['role'],
-                                $options['node']
-                            );
-                            ddd($table);
-                            $is_rename = true;
-                            /*
-                            Table::rename($object, $config->name, $config->environment);
-                            Table::import($object, $config->name, $config->environment, $config->table);
-                            */
-                        } else {
-                            if($is_entity === false){
-                                SchemaService::entity($object,
+                    foreach($node->environment as $name => $environments){
+                        foreach($environments as $environment => $config){
+                            $config->table = Table::all($object, $config->name, $config->environment);
+                            d($config);
+                            if(in_array($node->table, $config->table, true)){
+                                $table = Table::rename(
+                                    $object,
                                     $options['class'],
                                     $options['role'],
                                     $options['node']
                                 );
-                                $is_entity = true;
-                            }
-                            if($is_repository === false){
-                                //only create repository class if not exist, resetting means deleting the repository class and rerun this event
-                                SchemaService::repository($object,
-                                    $options['class'],
-                                    $options['role'],
-                                    $options['node']
-                                );
-                                $is_repository = true;
-                            }
-                            $platform = Database::platform($object, $config->name, $config->environment);
-                            d($platform);
-                            if($platform){
-                                d('has platform');
-                                SchemaService::sql($object,
-                                    $options['class'],
-                                    $options['role'],
-                                    $options['node'],
-                                    [
-                                        'platform' => $platform
-                                    ]
-                                );
+                                ddd($table);
+                                $is_rename = true;
+                                /*
+                                Table::rename($object, $config->name, $config->environment);
+                                Table::import($object, $config->name, $config->environment, $config->table);
+                                */
                             } else {
-                                throw new Exception('Platform not found...');
-                            }
+                                if($is_entity === false){
+                                    SchemaService::entity($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node']
+                                    );
+                                    $is_entity = true;
+                                }
+                                if($is_repository === false){
+                                    //only create repository class if not exist, resetting means deleting the repository class and rerun this event
+                                    SchemaService::repository($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node']
+                                    );
+                                    $is_repository = true;
+                                }
+                                $platform = Database::platform($object, $config->name, $config->environment);
+                                d($platform);
+                                if($platform){
+                                    d('has platform');
+                                    SchemaService::sql($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node'],
+                                        [
+                                            'platform' => $platform
+                                        ]
+                                    );
+                                } else {
+                                    throw new Exception('Platform not found...');
+                                }
 
-                            d('sql');
+                                d('sql');
 //                            Table::import($object, $config->name, $config->environment, $config->table);
+                            }
                         }
                     }
                 }
