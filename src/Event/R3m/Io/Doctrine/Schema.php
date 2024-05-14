@@ -39,11 +39,9 @@ class Schema {
                             $config->table = Table::all($object, $config->name, $config->environment);
                             d($config);
                             if(in_array($node->table, $config->table, true)){
-                                $table = Table::rename(
+                                $table = Table::rename_old(
                                     $object,
-                                    $options['class'],
-                                    $options['role'],
-                                    $options['node']
+                                    $config->table
                                 );
                                 ddd($table);
                                 $is_rename = true;

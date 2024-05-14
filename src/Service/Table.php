@@ -46,7 +46,8 @@ class Table extends Main
 
 {
 
-    public static function all($object, $name, $environment=null){
+    public static function all($object, $name, $environment=null): array
+    {
         $name = str_replace('.', '-', $name);
         $environment = str_replace('.', '-', $environment);
         Database::instance($object, $name, $environment);
@@ -59,77 +60,69 @@ class Table extends Main
         return $tables;
     }
 
-    public static function has(App $object, $class, $role, $node, $options=[]): bool
+    /**
+     * @throws Exception
+     */
+    public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
-        if(array_key_exists('environment', $options)){
-            $config = $options['environment'];
-            Database::instance($object, $config->name, $config->environment);
-            $tables = Database::tables($object, $config->name, $config->environment);
-            if(in_array($node->table, $tables)){
-                return true;
+        if(!array_key_exists('table', $options)){
+            throw new Exception('table not set in options');
+        }
+        if(
+            array_key_exists('rename', $options)
+        ){
+            $tables = Table::all($object, $name, $environment);
+            if($options['rename'] === true){
+                //new table name _old_nr
+                $table = $options['table'];
+                $rename = $table . '_old';
+                $counter = 1;
+                while(true){
+                    if(
+                        in_array(
+                            $rename,
+                            $tables,
+                            true
+                        ) === false
+                    ){
+                        break;
+                    }
+                    $rename = $table . '_old_' . $counter;
+                    $counter++;
+                    if(
+                        $counter >= PHP_INT_MAX ||
+                        $counter < 0
+                    ){
+                        throw new Exception('Out of range.');
+                    }
+                }
             }
+            elseif(is_string($options['rename'])){
+                if(
+                    in_array(
+                        $options['rename'],
+                        $tables,
+                        true
+                    )
+                ){
+                    return false;
+                }
+                $rename = $options['rename'];
+                //new table name
+            }
+            $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+            $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
+            // Construct the SQL query with the sanitized table names
+            $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
+
+            $connection = Database::connection($object, $name, $environment);
+            if($connection){
+                $stmt = $connection->prepare($sql);
+                $result = $stmt->executeStatement();
+                d($result);
+            }
+            return $sanitized_rename;
         }
         return false;
     }
-
-
-    /**
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public static function create(App $object, $flags, $options): array
-    {
-        if(!property_exists($options, 'platform')){
-            throw new Exception('Option, Platform not set...');
-        }
-        if(!property_exists($options, 'url')){
-            throw new Exception('Option, Url not set...');
-        }
-        $read = $object->data_read($options->url);
-        if($read){
-            $schema = new Schema();
-            $schema_table = $schema->createTable($read->get('Schema.table'));
-            $columns = $read->get('Schema.columns');
-            foreach($columns as $column_name => $column){
-                if(property_exists($column, 'type')){
-                    if(property_exists($column, 'options')){
-                        $schema_options = (array) $column->options;
-                        if(array_key_exists('nullable', $schema_options)){
-                            $schema_options['notnull'] = !$schema_options['nullable'];
-                            unset($schema_options['nullable']);
-                        }
-                        if(!empty($schema_options)) {
-                            $schema_table->addColumn($column_name, $column->type, $schema_options);
-                        }
-                    } else {
-                        $schema_table->addColumn($column_name, $column->type);
-                    }
-                }
-            }
-            if($read->has('Schema.primary_key')){
-                $schema_table->setPrimaryKey($read->get('Schema.primary_key'));
-            }
-            if($read->has('Schema.unique')){
-                foreach($read->get('Schema.unique') as $index){
-                    if(is_array($index)){
-                        $schema_table->addUniqueIndex($index);
-                    } else {
-                        $schema_table->addUniqueIndex([$index]);
-                    }
-                }
-            }
-            if($read->has('Schema.index')){
-                foreach($read->get('Schema.index') as $index){
-                    if(is_array($index)){
-                        $schema_table->addIndex($index , 'idx_' . implode('_', $index));
-                    } else {
-                        $schema_table->addIndex([$index] , 'idx_' . $index);
-                    }
-                }
-            }
-            return $schema->toSql($options->platform);
-        }
-        return [];
-    }
-
 }
