@@ -1415,6 +1415,8 @@ class Schema extends Main
                         unset($schema_options['id']);
                     }
                     if(!empty($schema_options)) {
+                        d($column_name);
+                        d($column->type);
                         d($schema_options);
                         $schema_table->addColumn($column_name, $column->type, $schema_options);
                     }
