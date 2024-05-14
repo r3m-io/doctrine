@@ -1403,7 +1403,6 @@ class Schema extends Main
         $schema = new \Doctrine\DBAL\Schema\Schema();
         $schema_table = $schema->createTable($node->get('table'));
         $columns = $node->get('column');
-        d($columns);
         foreach($columns as $column_name => $column){
             if(property_exists($column, 'type')){
                 if(property_exists($column, 'options')){
@@ -1420,6 +1419,7 @@ class Schema extends Main
                 }
             }
         }
+        d($columns);
         if($node->has('primary_key')){
             $schema_table->setPrimaryKey($node->get('primary_key'));
         }
