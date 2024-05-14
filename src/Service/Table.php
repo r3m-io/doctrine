@@ -115,6 +115,7 @@ class Table extends Main
                 $rename = $options['rename'];
                 //new table name
             }
+            d('yes');
             $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
             $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
             // Construct the SQL query with the sanitized table names
