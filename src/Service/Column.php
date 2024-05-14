@@ -42,7 +42,6 @@ class Column extends Main
                     $record['type'] = File::basename(get_class($column->getType()));
                     $list[]= $record;
                 }
-                d($list);
                 return $list;
             }
         }
