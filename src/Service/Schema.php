@@ -1383,6 +1383,7 @@ class Schema extends Main
         elseif(is_array($node)){
             $node = new Data($node);
         }
+        d($node);
         $config = false;
         if(array_key_exists('config', $options)){
             $config = $options['config'];
