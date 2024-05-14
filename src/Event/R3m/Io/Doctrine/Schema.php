@@ -36,6 +36,7 @@ class Schema {
                     d($node->environment);
                     foreach($node->environment as $name => $environments){
                         foreach($environments as $environment => $config){
+                            d('yes');
                             $config->table = Table::all($object, $config->name, $config->environment);
                             d($config);
                             if(in_array($node->table, $config->table, true)){
