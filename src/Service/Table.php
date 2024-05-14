@@ -127,6 +127,8 @@ class Table extends Main
                 strlen($sanitized_table) >= 2 &&
                 strlen($sanitized_rename) >= 2
             ){
+                $driver = Database::driver($object, $name, $environment);
+                ddd($driver);
                 $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
                 $connection = Database::connection($object, $name, $environment);
                 d($sql);
