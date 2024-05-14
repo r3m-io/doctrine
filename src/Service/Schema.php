@@ -1389,6 +1389,8 @@ class Schema extends Main
             $config = $options['config'];
         }
         $platform = null;
+        d($node);
+        d($config);
         if(
             is_object($config) &&
             property_exists($config, 'name') &&
