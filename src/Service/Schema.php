@@ -1444,19 +1444,13 @@ class Schema extends Main
             }
         }
         $sql = $schema->toSql($platform);
-        $connection = Database::connection($object, $config->name, $config->environment);
-        if($connection){
-            $stmt = $connection->prepare(implode(';' . PHP_EOL, $sql));
-            $result = $stmt->executeQuery();
-            ddd($result);
+        if($sql){
+            $connection = Database::connection($object, $config->name, $config->environment);
+            if($connection){
+                $stmt = $connection->prepare(implode(';' . PHP_EOL, $sql) . ';');
+                $result = $stmt->executeQuery();
+            }
         }
-
-
-//        $result = $stmt->executeQuery()->fetchAllAssociative();
-
-
-
-        d($sql);
     }
 
 }
