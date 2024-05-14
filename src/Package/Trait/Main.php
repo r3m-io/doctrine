@@ -112,6 +112,7 @@ trait Main {
             is_array($options->connection)
         ) {
             $node = new Node($object);
+            $record = false;
             foreach ($options->connection as $nr => $connection) {
                 if (!Core::is_uuid($connection)) {
                     $class = 'System.Doctrine.Environment';
