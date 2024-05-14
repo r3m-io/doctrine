@@ -74,10 +74,13 @@ class Table extends Main
             $tables = Table::all($object, $name, $environment);
             $table = '';
             $rename = '';
+            d($options);
             if($options['rename'] === true){
                 //new table name _old_nr
                 $table = $options['table'];
                 $rename = $table . '_old';
+                d($table);
+                d($rename);
                 $counter = 1;
                 while(true){
                     if(
