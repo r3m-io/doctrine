@@ -91,6 +91,11 @@ trait Main {
         ]);
     }
 
+    public function table_all($flags=null, $options=null): void
+    {
+        d($options);
+    }
+
     /**
      * @throws Exception
      */
