@@ -4,6 +4,7 @@ namespace R3m\Io\Doctrine\Service;
 use R3m\Io\App;
 use R3m\Io\Module\Core;
 use R3m\Io\Module\Database;
+use R3m\Io\Module\File;
 
 use Exception;
 
@@ -38,7 +39,7 @@ class Column extends Main
                 $list = [];
                 foreach($columns as $column){
                     $record = $column->toArray();
-                    $record['type'] = get_class($column->getType());
+                    $record['type'] = File::basename(get_class($column->getType()));
                     $list[]= $record;
                 }
                 d($list);
