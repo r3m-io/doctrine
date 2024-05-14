@@ -1403,7 +1403,7 @@ class Schema extends Main
         $schema = new \Doctrine\DBAL\Schema\Schema();
         $schema_table = $schema->createTable($node->get('table'));
         $columns = $node->get('column');
-        foreach($columns as $column_name => $column){
+        foreach($columns as $nr => $column){
             if(property_exists($column, 'type')){
                 if(property_exists($column, 'options')){
                     $schema_options = (array) $column->options;
@@ -1415,16 +1415,15 @@ class Schema extends Main
                         unset($schema_options['id']);
                     }
                     if(!empty($schema_options)) {
-                        if($column_name === 'id'){
+                        if($column->name === 'id'){
                             $column->type = 'integer';
                         }
-                        d($column_name);
                         d($column->type);
                         d($schema_options);
-                        $schema_table->addColumn($column_name, $column->type, $schema_options);
+                        $schema_table->addColumn($column->name, $column->type, $schema_options);
                     }
                 } else {
-                    $schema_table->addColumn($column_name, $column->type);
+                    $schema_table->addColumn($column->name, $column->type);
                 }
             }
         }
