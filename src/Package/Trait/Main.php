@@ -102,6 +102,60 @@ trait Main {
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
         }
+        $object = $this->object();
+        if(
+            is_string($options->connection)
+        ){
+            $options->connection = [$options->connection];
+        }
+        if(
+            is_array($options->connection)
+        ) {
+            $node = new Node($object);
+            foreach ($options->connection as $nr => $connection) {
+                if (!Core::is_uuid($connection)) {
+                    $class = 'System.Doctrine.Environment';
+                    $role = $node->role_system();
+                    $record = $node->record(
+                        $class,
+                        $role,
+                        [
+                            'filter' => [
+                                'name' => $connection,
+                                'environment' => $object->config('framework.environment')
+                            ]
+                        ]
+                    );
+                    if (
+                        $record &&
+                        array_key_exists('node', $record) &&
+                        property_exists($record['node'], 'uuid')
+                    ) {
+                        $options->connection[$nr] = $record['node']->uuid;
+                    } else {
+                        $record = $node->record(
+                            $class,
+                            $role,
+                            [
+                                'filter' => [
+                                    'name' => $connection,
+                                    'environment' => '*'
+                                ]
+                            ]
+                        );
+                        if (
+                            $record &&
+                            array_key_exists('node', $record) &&
+                            property_exists($record['node'], 'uuid')
+                        ) {
+                            $options->connection[$nr] = $record['node']->uuid;
+                        } else {
+                            throw new Exception('Environment not found...');
+                        }
+                    }
+                }
+            }
+        }
         d($options);
     }
 
