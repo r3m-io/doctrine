@@ -103,7 +103,6 @@ class Table extends Main
                     $stmt = $connection->prepare($sql);
                     $result = $stmt->executeStatement();
                 }
-                d($result);
                 return true;
             }
             catch(Exception $exception){
