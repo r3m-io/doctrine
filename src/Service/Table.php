@@ -130,10 +130,10 @@ class Table extends Main
                 $driver = Database::driver($object, $name, $environment);
                 switch($driver){
                     case 'pdo_mysql':
-                        $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
+                        $sql = 'RENAME TABLE ' . $sanitized_table . ' TO ' . $sanitized_rename;
                         break;
                     case 'pdo_sqlite':
-                        $sql = "ALTER TABLE $sanitized_table RENAME TO $sanitized_rename";
+                        $sql = 'ALTER TABLE ' . $sanitized_table . ' RENAME TO ' . $sanitized_rename;
                         break;
                     default:
                         throw new Exception('Driver not supported.');
