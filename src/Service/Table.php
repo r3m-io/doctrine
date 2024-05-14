@@ -72,6 +72,8 @@ class Table extends Main
             array_key_exists('rename', $options)
         ){
             $tables = Table::all($object, $name, $environment);
+            $table = '';
+            $rename = '';
             if($options['rename'] === true){
                 //new table name _old_nr
                 $table = $options['table'];
@@ -113,15 +115,20 @@ class Table extends Main
             $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
             $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
             // Construct the SQL query with the sanitized table names
-            $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
+            if(
+                strlen($sanitized_table) >= 2 &&
+                strlen($sanitized_rename) >= 2
+            ){
+                $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
 
-            $connection = Database::connection($object, $name, $environment);
-            if($connection){
-                $stmt = $connection->prepare($sql);
-                $result = $stmt->executeStatement();
-                d($result);
+                $connection = Database::connection($object, $name, $environment);
+                if($connection){
+                    $stmt = $connection->prepare($sql);
+                    $result = $stmt->executeStatement();
+                    d($result);
+                }
+                return $sanitized_rename;
             }
-            return $sanitized_rename;
         }
         return false;
     }
