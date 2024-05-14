@@ -69,14 +69,20 @@ class Schema {
                                     );
                                     $is_repository = true;
                                 }
-                                SchemaService::sql($object,
-                                    $options['class'],
-                                    $options['role'],
-                                    $options['node'],
-                                    [
-                                        'config' => $config,
-                                    ]
-                                );
+                                try {
+                                    SchemaService::sql($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node'],
+                                        [
+                                            'config' => $config,
+                                        ]
+                                    );
+                                }
+                                catch(Exception $exception){
+                                    echo $exception;
+                                }
+
                                 d('sql');
 //                            Table::import($object, $config->name, $config->environment, $config->table);
                             }
