@@ -4,6 +4,7 @@ namespace Package\R3m\Io\Doctrine\Trait;
 use R3m\Io\Config;
 
 use R3m\Io\Module\Core;
+use R3m\Io\Module\Database;
 use R3m\Io\Module\Event;
 use R3m\Io\Module\File;
 
@@ -169,6 +170,7 @@ trait Main {
                 property_exists($config, 'name') &&
                 property_exists($config, 'environment')
             ){
+                Database::instance($object, $config->name, $config->environment);
                 return Table::all($object, $config->name, $config->environment);
             }
 
