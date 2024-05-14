@@ -111,7 +111,6 @@ class Table extends Main
                 return true;
             }
             catch(Exception $exception){
-                ddd($exception);
             }
         }
         return false;
