@@ -1412,6 +1412,9 @@ class Schema extends Main
                         unset($schema_options['nullable']);
                     }
                     if(!empty($schema_options)) {
+                        if(array_key_exists('id', $schema_options)){
+                            unset($schema_options['id']);
+                        }
                         $schema_table->addColumn($column_name, $column->type, $schema_options);
                     }
                 } else {
