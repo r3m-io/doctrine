@@ -46,17 +46,22 @@ class Table extends Main
 
 {
 
+    /**
+     * @throws Exception
+     */
     public static function all($object, $name, $environment=null): array
     {
         $name = str_replace('.', '-', $name);
         $environment = str_replace('.', '-', $environment);
-        Database::instance($object, $name, $environment);
         $schema_manager = Database::schema_manager($object, $name, $environment);
+        if(!$schema_manager){
+            Database::instance($object, $name, $environment);
+            $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
         $tables = [];
         if($schema_manager){
             $tables = $schema_manager->listTableNames();
         }
-        d($tables);
         return $tables;
     }
 
@@ -76,13 +81,10 @@ class Table extends Main
             $tables = Table::all($object, $name, $environment);
             $table = '';
             $rename = '';
-            d($options);
             if($options['rename'] === true){
                 //new table name _old_nr
                 $table = $options['table'];
                 $rename = $table . '_old';
-                d($table);
-                d($rename);
                 $counter = 1;
                 while(true){
                     if(
@@ -117,11 +119,8 @@ class Table extends Main
                 $rename = $options['rename'];
                 //new table name
             }
-            d('yes');
             $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
             $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
-            d($sanitized_table);
-            d($sanitized_rename);
             // Construct the SQL query with the sanitized table names
             if(
                 strlen($sanitized_table) >= 2 &&
@@ -139,17 +138,14 @@ class Table extends Main
                         throw new Exception('Driver not supported.');
                 }
                 $connection = Database::connection($object, $name, $environment);
-                d($sql);
                 if($connection){
                     try {
                         $stmt = $connection->prepare($sql);
                         $result = $stmt->executeStatement();
-                        d($result);
                     }
                     catch(Exception $exception){
-                        d($exception);
+                        ddd($exception);
                     }
-
                 }
                 return $sanitized_rename;
             }
