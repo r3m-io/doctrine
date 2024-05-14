@@ -135,57 +135,21 @@ class Table extends Main
         if(!property_exists($options, 'table')){
             throw new Exception('table not set in options');
         }
-        $connection = Database::connection($object, $name, $environment);
-        if(!$connection){
+        try {
+            $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
+        catch(Exception $exception){
             Database::instance($object, $name, $environment);
-            $connection = Database::connection($object, $name, $environment);
+            $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         $tables = Table::all($object, $name, $environment);
         d($tables);
         d($options->table);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
-        if(in_array($options->table, $tables, true)){
-            $sql = "PRAGMA table_info($sanitized_table)";
-            $stmt = $connection->executeQuery($sql);
-            $columns = $stmt->fetchAllAssociative();
-            ddd($columns);
+        if(in_array($sanitized_table, $tables, true)){
+            $schema_manager->dropTable($sanitized_table);
             return true;
         }
-        /*
-        $connection = Database::connection($object, $name, $environment);
-        $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
-        $driver = Database::driver($object, $name, $environment);
-        $reset = false;
-        switch($driver){
-            case 'pdo_mysql':
-                $sql = 'TRUNCATE TABLE ' . $sanitized_table;
-                break;
-            case 'pdo_sqlite':
-                $sql = 'DELETE FROM ' . $sanitized_table;
-                $reset = 'DELETE FROM SQLITE_SEQUENCE WHERE name = "' . $sanitized_table . '"';
-                break;
-            default:
-                throw new Exception('Driver not supported.');
-
-        }
-        if($connection){
-            try {
-                $stmt = $connection->prepare($sql);
-                $result = $stmt->executeStatement();
-                if($driver === 'pdo_sqlite' && $reset){
-                    try {
-                        $stmt = $connection->prepare($reset);
-                        $result = $stmt->executeStatement();
-                    }
-                    catch(Exception $exception){
-                    }
-                }
-                return true;
-            }
-            catch(Exception $exception){
-            }
-        }
-        */
         return false;
     }
 
