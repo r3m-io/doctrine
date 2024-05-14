@@ -170,8 +170,9 @@ trait Main {
                 property_exists($config, 'name') &&
                 property_exists($config, 'environment')
             ){
-                $connection = Database::connection($object, $config->name, $config->environment);
-                if(!$connection){
+                try {
+                    $connection = Database::connection($object, $config->name, $config->environment);
+                } catch(Exception $exception){
                     Database::instance($object, $config->name, $config->environment);
                 }
                 return Table::all($object, $config->name, $config->environment);
@@ -260,8 +261,9 @@ trait Main {
                 property_exists($config, 'name') &&
                 property_exists($config, 'environment')
             ){
-                $connection = Database::connection($object, $config->name, $config->environment);
-                if(!$connection){
+                try {
+                    $connection = Database::connection($object, $config->name, $config->environment);
+                } catch(Exception $exception){
                     Database::instance($object, $config->name, $config->environment);
                 }
                 return Table::truncate($object, $config->name, $config->environment, $options);
@@ -349,8 +351,9 @@ trait Main {
                 property_exists($config, 'name') &&
                 property_exists($config, 'environment')
             ){
-                $connection = Database::connection($object, $config->name, $config->environment);
-                if(!$connection){
+                try {
+                    $connection = Database::connection($object, $config->name, $config->environment);
+                } catch(Exception $exception){
                     Database::instance($object, $config->name, $config->environment);
                 }
                 return Table::delete($object, $config->name, $config->environment, $options);
