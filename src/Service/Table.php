@@ -120,6 +120,8 @@ class Table extends Main
             d('yes');
             $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
             $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
+            d($sanitized_table);
+            d($sanitized_rename);
             // Construct the SQL query with the sanitized table names
             if(
                 strlen($sanitized_table) >= 2 &&
