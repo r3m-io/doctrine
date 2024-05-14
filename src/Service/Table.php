@@ -137,13 +137,15 @@ class Table extends Main
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         $tables = Table::all($object, $name, $environment);
+        d($tables);
+        d($options->table);
         if(in_array($options->table, $tables, true)){
             $table = $schema_manager->listTableDetails($options->table);
             ddd($table->getColumns());
             $schema_manager->dropTable($table);
             return true;
         }
-
+        /*
         $connection = Database::connection($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         $driver = Database::driver($object, $name, $environment);
@@ -177,6 +179,7 @@ class Table extends Main
             catch(Exception $exception){
             }
         }
+        */
         return false;
     }
 
