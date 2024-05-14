@@ -37,7 +37,8 @@ class Column extends Main
             if($columns){
                 $list = [];
                 foreach($columns as $column){
-                    $list[] = $column->toArray();
+                    $record = $column->toArray();
+                    d($record);
                 }
                 return $list;
             }
