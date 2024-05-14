@@ -25,17 +25,15 @@ class Column extends Main
         if (!property_exists($options, 'table')) {
             throw new Exception('table not set in options');
         }
-        $connection = Database::connection($object, $name, $environment);
-        if (!$connection) {
+        $schema_manager = Database::schema_manager($object, $name, $environment);
+        if (!$schema_manager) {
             Database::instance($object, $name, $environment);
-            $connection = Database::connection($object, $name, $environment);
+            $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         $tables = Table::all($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
-        if (in_array($options->table, $tables, true)) {
-            $sql = "PRAGMA table_info($sanitized_table)";
-            $stmt = $connection->executeQuery($sql);
-            return $stmt->fetchAllAssociative();
+        if (in_array($sanitized_table, $tables, true)) {
+            return $schema_manager->listTableColumns($sanitized_table);
         }
         return [];
     }
