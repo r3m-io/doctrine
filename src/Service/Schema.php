@@ -1365,7 +1365,7 @@ class Schema extends Main
 
     public static function sql(App $object, $class, $role, $node, $options=[]): void
     {
-        echo 'sql injected...';
+        d($node);
     }
 
 }
