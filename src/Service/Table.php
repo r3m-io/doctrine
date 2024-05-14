@@ -55,8 +55,10 @@ class Table extends Main
         $environment = str_replace('.', '-', $environment);
         d($name);
         d($environment);
-        $schema_manager = Database::schema_manager($object, $name, $environment);
-        if(!$schema_manager){
+        try {
+            $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
+        catch(Exception $exception){
             Database::instance($object, $name, $environment);
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
