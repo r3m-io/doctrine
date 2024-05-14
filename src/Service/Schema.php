@@ -1366,17 +1366,28 @@ class Schema extends Main
 
     /**
      * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public static function sql(App $object, $class, $role, $node, $options=[]): void
     {
         $config = false;
 
-        ddd(get_class($node));
-
+        if(is_object($node)){
+            $node_class = get_class($node);
+            switch($node_class) {
+                case 'stdClass':
+                    $node = new Data($node);
+                    break;
+                default:
+                    throw new Exception('unknown class: ' . $node_class);
+            }
+        }
+        elseif(is_array($node)){
+            $node = new Data($node);
+        }
         if(array_key_exists('config', $options)){
             $config = $options['config'];
         }
-        /*
         $platform = null;
         if(
             is_object($config) &&
@@ -1384,9 +1395,12 @@ class Schema extends Main
             property_exists($config, 'environment')
         ){
             $platform = Database::platform($object, $config->name, $config->environment);
+            if(!$platform){
+                throw new Exception('Platform not found, are you connected?');
+            }
             $schema = new \Doctrine\DBAL\Schema\Schema();
-            $schema_table = $schema->createTable($read->get('Schema.table'));
-            $columns = $read->get('Schema.columns');
+            $schema_table = $schema->createTable($node->get('table'));
+            $columns = $node->get('column');
             foreach($columns as $column_name => $column){
                 if(property_exists($column, 'type')){
                     if(property_exists($column, 'options')){
@@ -1403,11 +1417,11 @@ class Schema extends Main
                     }
                 }
             }
-            if($read->has('Schema.primary_key')){
-                $schema_table->setPrimaryKey($read->get('Schema.primary_key'));
+            if($node->has('primary_key')){
+                $schema_table->setPrimaryKey($node->get('primary_key'));
             }
-            if($read->has('Schema.unique')){
-                foreach($read->get('Schema.unique') as $index){
+            if($node->has('unique')){
+                foreach($node->get('unique') as $index){
                     if(is_array($index)){
                         $schema_table->addUniqueIndex($index);
                     } else {
@@ -1415,8 +1429,8 @@ class Schema extends Main
                     }
                 }
             }
-            if($read->has('Schema.index')){
-                foreach($read->get('Schema.index') as $index){
+            if($node->has('index')){
+                foreach($node->get('index') as $index){
                     if(is_array($index)){
                         $schema_table->addIndex($index , 'idx_' . implode('_', $index));
                     } else {
@@ -1424,11 +1438,11 @@ class Schema extends Main
                     }
                 }
             }
-            return $schema->toSql($platform);
+            $sql = $schema->toSql($platform);
+            ddd($sql);
         } else {
             throw new Exception('Platform not found...');
         }
-        */
     }
 
 }
