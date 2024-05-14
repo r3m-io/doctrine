@@ -65,6 +65,8 @@ class Table extends Main
      */
     public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
+        $name = str_replace('.', '-', $name);
+        $environment = str_replace('.', '-', $environment);
         if(!array_key_exists('table', $options)){
             throw new Exception('table not set in options');
         }
