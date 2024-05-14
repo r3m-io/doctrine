@@ -22,13 +22,16 @@ class Doctrine extends Controller {
                     array_key_exists('name', $record) &&
                     array_key_exists('environment', $record)
                 ){
-                    if($record['environment'] === '*'){
-                        $result[$record['name']] = $record;
+                    $name = str_replace('.', '-', $record['name']);
+                    $environment = str_replace('.', '-', $record['environment']);
+                    if($environment === '*'){
+                        $result[$name] = [];
+                        $result[$name]['*'] = $record;
                     } else {
                         if(!array_key_exists($record['name'], $result)){
-                            $result[$record['name']] = [];
+                            $result[$name] = [];
                         }
-                        $result[$record['name']][$record['environment']] = $record;
+                        $result[$name][$environment] = $record;
                     }
                 }
                 elseif(
@@ -36,13 +39,16 @@ class Doctrine extends Controller {
                     property_exists($record, 'name') &&
                     property_exists($record, 'environment')
                 ){
-                    if($record->environment === '*'){
-                        $result[$record->name] = $record;
+                    $name = str_replace('.', '-', $record->name);
+                    $environment = str_replace('.', '-', $record->environment);
+                    if($environment === '*'){
+                        $result[$name] = [];
+                        $result[$name]['*'] = $record;
                     } else {
                         if(!array_key_exists($record->name, $result)){
-                            $result[$record->name] = [];
+                            $result[$name] = [];
                         }
-                        $result[$record->name][$record->environment] = $record;
+                        $result[$name][$environment] = $record;
                     }
                 }
             }
