@@ -1,14 +1,16 @@
 <?php
 namespace Package\R3m\Io\Doctrine\Trait;
 
-use Doctrine\DBAL\Schema\Schema;
-
 use R3m\Io\Config;
 
 use R3m\Io\Module\Core;
 use R3m\Io\Module\Event;
 use R3m\Io\Module\File;
+
 use R3m\Io\Node\Model\Node;
+
+use R3m\Io\Doctrine\Service\Table;
+
 
 use Exception;
 
@@ -94,7 +96,7 @@ trait Main {
     /**
      * @throws Exception
      */
-    public function table_all($flags=null, $options=null): void
+    public function table_all($flags=null, $options=null): array
     {
         if(!property_exists($options, 'environment')){
             throw new Exception('Option: environment not set...');
@@ -160,8 +162,20 @@ trait Main {
                 }
             }
         }
-        d($record);
-        d($options);
+        if(
+            $record &&
+            array_key_exists('node', $record)
+        ){
+            $config = $record['node'];
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                return Table::all($object, $config->name, $config->environment);
+            }
+
+        }
+        return [];
     }
 
     /**
