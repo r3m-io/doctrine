@@ -129,6 +129,7 @@ class Table extends Main
             ){
                 $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
                 $connection = Database::connection($object, $name, $environment);
+                d($sql);
                 if($connection){
                     try {
                         $stmt = $connection->prepare($sql);
