@@ -41,7 +41,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -107,7 +108,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -173,7 +175,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -239,7 +242,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -305,7 +309,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -371,7 +376,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -437,7 +443,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -503,7 +510,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
@@ -569,7 +577,8 @@
                                                 "map",
                                                 "target",
                                                 "join",
-                                                "definition"
+                                                "definition",
+                                                "comment"
                                             ],
                                             "object": {
                                                 "join": {
