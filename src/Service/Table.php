@@ -128,13 +128,17 @@ class Table extends Main
                 strlen($sanitized_rename) >= 2
             ){
                 $sql = "RENAME TABLE $sanitized_table TO $sanitized_rename";
-
                 $connection = Database::connection($object, $name, $environment);
-                d($connection);
                 if($connection){
-                    $stmt = $connection->prepare($sql);
-                    $result = $stmt->executeStatement();
-                    d($result);
+                    try {
+                        $stmt = $connection->prepare($sql);
+                        $result = $stmt->executeStatement();
+                        d($result);
+                    }
+                    catch(Exception $exception){
+                        d($exception);
+                    }
+
                 }
                 return $sanitized_rename;
             }
