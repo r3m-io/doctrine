@@ -90,7 +90,7 @@ class Table extends Main
                 break;
             case 'pdo_sqlite':
                 $sql = 'DELETE FROM ' . $sanitized_table;
-                $reset = 'UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = ' . $sanitized_table;
+                $reset = 'DELETE FROM SQLITE_SEQUENCE WHERE name = "' . $sanitized_table . '"';
                 break;
             default:
                 throw new Exception('Driver not supported.');
@@ -100,7 +100,6 @@ class Table extends Main
             try {
                 $stmt = $connection->prepare($sql);
                 $result = $stmt->executeStatement();
-                d($result);
                 if($driver === 'pdo_sqlite' && $reset){
                     try {
                         $stmt = $connection->prepare($reset);
@@ -108,7 +107,7 @@ class Table extends Main
                         d($result);
                     }
                     catch(Exception $exception){
-
+                        d($exception);
                     }
                 }
                 return true;
