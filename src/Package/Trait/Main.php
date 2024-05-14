@@ -181,7 +181,7 @@ trait Main {
     /**
      * @throws Exception
      */
-    public function table_truncate($flags=null, $options=null): array
+    public function table_truncate($flags=null, $options=null): bool
     {
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
@@ -190,6 +190,7 @@ trait Main {
             throw new Exception('Option: table not set...');
         }
         $object = $this->object();
+        $record = false;
         if(
             is_string($options->connection)
         ){
@@ -199,7 +200,6 @@ trait Main {
             is_array($options->connection)
         ) {
             $node = new Node($object);
-            $record = false;
             $environment = $options->environment ?? $object->config('framework.environment');
             foreach ($options->connection as $nr => $connection) {
                 if (!Core::is_uuid($connection)) {
@@ -260,9 +260,8 @@ trait Main {
                 Database::instance($object, $config->name, $config->environment);
                 return Table::truncate($object, $config->name, $config->environment, $options);
             }
-
         }
-        return [];
+        return false;
     }
 
     /**
