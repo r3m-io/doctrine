@@ -98,9 +98,6 @@ trait Main {
      */
     public function table_all($flags=null, $options=null): array
     {
-        if(!property_exists($options, 'environment')){
-            throw new Exception('Option: environment not set...');
-        }
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
         }
@@ -115,6 +112,7 @@ trait Main {
         ) {
             $node = new Node($object);
             $record = false;
+            $environment = $options->environment ?? $object->config('framework.environment');
             foreach ($options->connection as $nr => $connection) {
                 if (!Core::is_uuid($connection)) {
                     $class = 'System.Doctrine.Environment';
@@ -125,7 +123,7 @@ trait Main {
                         [
                             'filter' => [
                                 'name' => $connection,
-                                'environment' => $object->config('framework.environment')
+                                'environment' => $environment
                             ]
                         ]
                     );
