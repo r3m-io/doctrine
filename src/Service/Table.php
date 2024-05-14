@@ -68,25 +68,33 @@ class Table extends Main
     /**
      * @throws Exception
      */
-    public static function truncate($object, $name, $environment=null, $options=[]): array
+    public static function truncate($object, $name, $environment=null, $options=null): bool
     {
+        $options = Core::object($options);
         if($environment === null){
             $environment = $object->config('environment');
         } else {
             $environment = str_replace('.', '-', $environment);
         }
         $name = str_replace('.', '-', $name);
-        ddd($options);
-        $schema_manager = Database::schema_manager($object, $name, $environment);
-        if(!$schema_manager){
-            Database::instance($object, $name, $environment);
-            $schema_manager = Database::schema_manager($object, $name, $environment);
+        if(!property_exists($options, 'table')){
+            throw new Exception('table not set in options');
         }
-        $tables = [];
-        if($schema_manager){
-            $tables = $schema_manager->listTableNames();
+        $connection = Database::connection($object, $name, $environment);
+        $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
+        $sql = 'TRUNCATE TABLE ' . $sanitized_table;
+        if($connection){
+            try {
+                $stmt = $connection->prepare($sql);
+                $result = $stmt->executeStatement();
+                d($result);
+                return true;
+            }
+            catch(Exception $exception){
+                ddd($exception);
+            }
         }
-        return $tables;
+        return false;
     }
 
     /**
@@ -94,20 +102,19 @@ class Table extends Main
      */
     public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
+        $options = Core::object($options);
         $name = str_replace('.', '-', $name);
         $environment = str_replace('.', '-', $environment);
-        if(!array_key_exists('table', $options)){
+        if(!property_exists($options, 'table')){
             throw new Exception('table not set in options');
         }
-        if(
-            array_key_exists('rename', $options)
-        ){
+        if(property_exists($options, 'rename')){
             $tables = Table::all($object, $name, $environment);
             $table = '';
             $rename = '';
-            if($options['rename'] === true){
+            if($options->rename === true){
                 //new table name _old_nr
-                $table = $options['table'];
+                $table = $options->table;
                 $rename = $table . '_old';
                 $counter = 1;
                 while(true){
@@ -130,17 +137,17 @@ class Table extends Main
                     }
                 }
             }
-            elseif(is_string($options['rename'])){
+            elseif(is_string($options->rename)){
                 if(
                     in_array(
-                        $options['rename'],
+                        $options->rename,
                         $tables,
                         true
                     )
                 ){
                     return false;
                 }
-                $rename = $options['rename'];
+                $rename = $options->rename;
                 //new table name
             }
             $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
