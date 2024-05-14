@@ -3,10 +3,13 @@ namespace R3m\Io\Doctrine\Service;
 
 use R3m\Io\App;
 
-use Exception;
 use R3m\Io\Module\Data;
 use R3m\Io\Module\Controller;
 use R3m\Io\Module\File;
+
+use Exception;
+
+use R3m\Io\Exception\FileWriteException;
 
 class Schema extends Main
 
@@ -1311,9 +1314,10 @@ class Schema extends Main
         }
     }
 
-    /*
-    * @throws Exception
-    */
+    /**
+     * @throws FileWriteException
+     * @throws Exception
+     */
     public static function repository(App $object, $class, $role, $node, $options=[]): void
     {
         if(is_object($node)){
@@ -1357,6 +1361,11 @@ class Schema extends Main
                 echo 'Write: ' . $target . PHP_EOL;
             }
         }
+    }
+
+    public static function sql(App $object, $class, $role, $node, $options=[]): void
+    {
+        echo 'sql injected...';
     }
 
 }

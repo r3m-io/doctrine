@@ -66,7 +66,12 @@ class Schema {
                                 );
                                 $is_repository = true;
                             }
-                            d('create table');
+                            SchemaService::sql($object,
+                                $options['class'],
+                                $options['role'],
+                                $options['node']
+                            );
+                            d('sql');
 //                            Table::import($object, $config->name, $config->environment, $config->table);
                         }
                     }
