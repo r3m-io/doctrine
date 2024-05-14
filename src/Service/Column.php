@@ -34,7 +34,13 @@ class Column extends Main
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         if (in_array($sanitized_table, $tables, true)) {
             $columns = $schema_manager->listTableColumns($sanitized_table);
-            ddd($columns);
+            if($columns){
+                $list = [];
+                foreach($columns as $column){
+                    $list[] = $column->toArray();
+                }
+                return $list;
+            }
         }
         return [];
     }
