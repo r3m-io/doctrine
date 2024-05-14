@@ -100,10 +100,16 @@ class Table extends Main
             try {
                 $stmt = $connection->prepare($sql);
                 $result = $stmt->executeStatement();
+                d($result);
                 if($driver === 'pdo_sqlite' && $reset){
-                    $stmt = $connection->prepare($reset);
-                    $result = $stmt->executeStatement();
-                    d($result);
+                    try {
+                        $stmt = $connection->prepare($reset);
+                        $result = $stmt->executeStatement();
+                        d($result);
+                    }
+                    catch(Exception $exception){
+
+                    }
                 }
                 return true;
             }
