@@ -153,9 +153,13 @@ trait Main {
                             throw new Exception('Environment not found...');
                         }
                     }
+                    if($record){
+                        break;
+                    }
                 }
             }
         }
+        d($record);
         d($options);
     }
 
