@@ -119,6 +119,70 @@ class Table extends Main
     /**
      * @throws Exception
      */
+    public static function delete($object, $name, $environment=null, $options=null): bool
+    {
+        $options = Core::object($options);
+        if($environment === null){
+            $environment = $object->config('environment');
+        } else {
+            $environment = str_replace('.', '-', $environment);
+        }
+        $name = str_replace('.', '-', $name);
+        if(!property_exists($options, 'table')){
+            throw new Exception('table not set in options');
+        }
+        $schema_manager = Database::schema_manager($object, $name, $environment);
+        if(!$schema_manager){
+            Database::instance($object, $name, $environment);
+            $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
+        $tables = Table::all($object, $name, $environment);
+        if(in_array($options->table, $tables, true)){
+            $table = $schema_manager->listTableDetails($options->table);
+            ddd($table->getColumns());
+            $schema_manager->dropTable($table);
+            return true;
+        }
+
+        $connection = Database::connection($object, $name, $environment);
+        $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
+        $driver = Database::driver($object, $name, $environment);
+        $reset = false;
+        switch($driver){
+            case 'pdo_mysql':
+                $sql = 'TRUNCATE TABLE ' . $sanitized_table;
+                break;
+            case 'pdo_sqlite':
+                $sql = 'DELETE FROM ' . $sanitized_table;
+                $reset = 'DELETE FROM SQLITE_SEQUENCE WHERE name = "' . $sanitized_table . '"';
+                break;
+            default:
+                throw new Exception('Driver not supported.');
+
+        }
+        if($connection){
+            try {
+                $stmt = $connection->prepare($sql);
+                $result = $stmt->executeStatement();
+                if($driver === 'pdo_sqlite' && $reset){
+                    try {
+                        $stmt = $connection->prepare($reset);
+                        $result = $stmt->executeStatement();
+                    }
+                    catch(Exception $exception){
+                    }
+                }
+                return true;
+            }
+            catch(Exception $exception){
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
     public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
         $options = Core::object($options);
