@@ -1442,7 +1442,7 @@ class Schema extends Main
             }
         }
         $sql = $schema->toSql($platform);
-        ddd($sql);
+        d($sql);
     }
 
 }
