@@ -91,8 +91,17 @@ trait Main {
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function table_all($flags=null, $options=null): void
     {
+        if(!property_exists($options, 'environment')){
+            throw new Exception('Option: environment not set...');
+        }
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
         d($options);
     }
 
@@ -106,22 +115,22 @@ trait Main {
         if(!property_exists($options, 'url')){
             throw new Exception('Option: url not set...');
         }
-        if(!property_exists($options, 'environment')){
-            throw new Exception('Option: environment not set...');
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
         }
         if(property_exists($options, 'force')){
             $is_force = $options->force;
         }
         $node = new Node($object);
         if(
-            is_string($options->environment)
+            is_string($options->connection)
         ){
-            $options->environment = [$options->environment];
+            $options->connection = [$options->connection];
         }
         if(
-            is_array($options->environment)
+            is_array($options->connection)
         ){
-            foreach($options->environment as $nr => $environment){
+            foreach($options->connection as $nr => $environment){
                 if(!Core::is_uuid($environment)){
                     $class = 'System.Doctrine.Environment';
                     $role = $node->role_system();
@@ -140,7 +149,7 @@ trait Main {
                         array_key_exists('node', $record) &&
                         property_exists($record['node'], 'uuid')
                     ){
-                        $options->environment[$nr] = $record['node']->uuid;
+                        $options->connection[$nr] = $record['node']->uuid;
                     } else {
                         $record = $node->record(
                             $class,
@@ -157,7 +166,7 @@ trait Main {
                             array_key_exists('node', $record) &&
                             property_exists($record['node'], 'uuid')
                         ){
-                            $options->environment[$nr] = $record['node']->uuid;
+                            $options->connection[$nr] = $record['node']->uuid;
                         } else {
                             throw new Exception('Environment not found...');
                         }
@@ -169,7 +178,7 @@ trait Main {
         // system.doctrine.environment is user input
         $options->node = (object) [
             'default' => (object) [
-                'environment' => $options->environment
+                'environment' => $options->connection
             ]
         ];
         if(
