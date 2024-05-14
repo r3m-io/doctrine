@@ -1415,6 +1415,9 @@ class Schema extends Main
                         unset($schema_options['id']);
                     }
                     if(!empty($schema_options)) {
+                        if($column_name === 'id'){
+                            $column->type = 'integer';
+                        }
                         d($column_name);
                         d($column->type);
                         d($schema_options);
