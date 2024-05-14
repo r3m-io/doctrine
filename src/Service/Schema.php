@@ -1370,8 +1370,6 @@ class Schema extends Main
      */
     public static function sql(App $object, $class, $role, $node, $options=[]): void
     {
-        $config = false;
-
         if(is_object($node)){
             $node_class = get_class($node);
             switch($node_class) {
@@ -1385,6 +1383,7 @@ class Schema extends Main
         elseif(is_array($node)){
             $node = new Data($node);
         }
+        $config = false;
         if(array_key_exists('config', $options)){
             $config = $options['config'];
         }
@@ -1395,56 +1394,54 @@ class Schema extends Main
             is_object($config) &&
             property_exists($config, 'name') &&
             property_exists($config, 'environment')
-        ){
+        ) {
             $platform = Database::platform($object, $config->name, $config->environment);
-            if(!$platform){
+            if (!$platform) {
                 throw new Exception('Platform not found, are you connected?');
             }
-            $schema = new \Doctrine\DBAL\Schema\Schema();
-            $schema_table = $schema->createTable($node->get('table'));
-            $columns = $node->get('column');
-            foreach($columns as $column_name => $column){
-                if(property_exists($column, 'type')){
-                    if(property_exists($column, 'options')){
-                        $schema_options = (array) $column->options;
-                        if(array_key_exists('nullable', $schema_options)){
-                            $schema_options['notnull'] = !$schema_options['nullable'];
-                            unset($schema_options['nullable']);
-                        }
-                        if(!empty($schema_options)) {
-                            $schema_table->addColumn($column_name, $column->type, $schema_options);
-                        }
-                    } else {
-                        $schema_table->addColumn($column_name, $column->type);
-                    }
-                }
-            }
-            if($node->has('primary_key')){
-                $schema_table->setPrimaryKey($node->get('primary_key'));
-            }
-            if($node->has('unique')){
-                foreach($node->get('unique') as $index){
-                    if(is_array($index)){
-                        $schema_table->addUniqueIndex($index);
-                    } else {
-                        $schema_table->addUniqueIndex([$index]);
-                    }
-                }
-            }
-            if($node->has('index')){
-                foreach($node->get('index') as $index){
-                    if(is_array($index)){
-                        $schema_table->addIndex($index , 'idx_' . implode('_', $index));
-                    } else {
-                        $schema_table->addIndex([$index] , 'idx_' . $index);
-                    }
-                }
-            }
-            $sql = $schema->toSql($platform);
-            ddd($sql);
-        } else {
-            throw new Exception('Platform not found...');
         }
+        $schema = new \Doctrine\DBAL\Schema\Schema();
+        $schema_table = $schema->createTable($node->get('table'));
+        $columns = $node->get('column');
+        foreach($columns as $column_name => $column){
+            if(property_exists($column, 'type')){
+                if(property_exists($column, 'options')){
+                    $schema_options = (array) $column->options;
+                    if(array_key_exists('nullable', $schema_options)){
+                        $schema_options['notnull'] = !$schema_options['nullable'];
+                        unset($schema_options['nullable']);
+                    }
+                    if(!empty($schema_options)) {
+                        $schema_table->addColumn($column_name, $column->type, $schema_options);
+                    }
+                } else {
+                    $schema_table->addColumn($column_name, $column->type);
+                }
+            }
+        }
+        if($node->has('primary_key')){
+            $schema_table->setPrimaryKey($node->get('primary_key'));
+        }
+        if($node->has('unique')){
+            foreach($node->get('unique') as $index){
+                if(is_array($index)){
+                    $schema_table->addUniqueIndex($index);
+                } else {
+                    $schema_table->addUniqueIndex([$index]);
+                }
+            }
+        }
+        if($node->has('index')){
+            foreach($node->get('index') as $index){
+                if(is_array($index)){
+                    $schema_table->addIndex($index , 'idx_' . implode('_', $index));
+                } else {
+                    $schema_table->addIndex([$index] , 'idx_' . $index);
+                }
+            }
+        }
+        $sql = $schema->toSql($platform);
+        ddd($sql);
     }
 
 }
