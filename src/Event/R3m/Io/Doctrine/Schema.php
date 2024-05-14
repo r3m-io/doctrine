@@ -48,7 +48,37 @@ class Schema {
                                         'rename' => true
                                     ]
                                 );
-                                ddd($table);
+                                if($is_entity === false){
+                                    SchemaService::entity($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node']
+                                    );
+                                    $is_entity = true;
+                                }
+                                if($is_repository === false){
+                                    //only create repository class if not exist, resetting means deleting the repository class and rerun this event
+                                    SchemaService::repository($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node']
+                                    );
+                                    $is_repository = true;
+                                }
+                                try {
+                                    SchemaService::sql($object,
+                                        $options['class'],
+                                        $options['role'],
+                                        $options['node'],
+                                        [
+                                            'config' => $config,
+                                        ]
+                                    );
+                                }
+                                catch(Exception $exception){
+                                    echo $exception;
+                                }
+                                d($table);
                                 $is_rename = true;
                                 /*
                                 Table::rename($object, $config->name, $config->environment);
