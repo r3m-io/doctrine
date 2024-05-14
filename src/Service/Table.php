@@ -104,10 +104,8 @@ class Table extends Main
                     try {
                         $stmt = $connection->prepare($reset);
                         $result = $stmt->executeStatement();
-                        d($result);
                     }
                     catch(Exception $exception){
-                        d($exception);
                     }
                 }
                 return true;
