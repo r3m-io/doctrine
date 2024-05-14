@@ -69,22 +69,14 @@ class Schema {
                                     );
                                     $is_repository = true;
                                 }
-                                $platform = Database::platform($object, $config->name, $config->environment);
-                                d($platform);
-                                if($platform){
-                                    d('has platform');
-                                    SchemaService::sql($object,
-                                        $options['class'],
-                                        $options['role'],
-                                        $options['node'],
-                                        [
-                                            'platform' => $platform
-                                        ]
-                                    );
-                                } else {
-                                    throw new Exception('Platform not found...');
-                                }
-
+                                SchemaService::sql($object,
+                                    $options['class'],
+                                    $options['role'],
+                                    $options['node'],
+                                    [
+                                        'config' => $config,
+                                    ]
+                                );
                                 d('sql');
 //                            Table::import($object, $config->name, $config->environment, $config->table);
                             }

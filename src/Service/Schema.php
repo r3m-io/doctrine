@@ -5,6 +5,7 @@ use R3m\Io\App;
 
 use R3m\Io\Module\Data;
 use R3m\Io\Module\Controller;
+use R3m\Io\Module\Database;
 use R3m\Io\Module\File;
 
 use Exception;
@@ -1365,6 +1366,27 @@ class Schema extends Main
 
     public static function sql(App $object, $class, $role, $node, $options=[]): void
     {
+        $config = false;
+        if(array_key_exists('config', $options)){
+            $config = $options['config'];
+        }
+        $platform = null;
+        if(
+            is_object($config) &&
+            property_exists($config, 'name') &&
+            property_exists($config, 'environment')
+        ){
+            $platform = Database::platform($object, $config->name, $config->environment);
+        }
+
+
+        d($platform);
+        if($platform){
+            d('has platform');
+
+        } else {
+            throw new Exception('Platform not found...');
+        }
         d($node);
     }
 
