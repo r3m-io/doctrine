@@ -33,7 +33,8 @@ class Column extends Main
         $tables = Table::all($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         if (in_array($sanitized_table, $tables, true)) {
-            return $schema_manager->listTableColumns($sanitized_table);
+            $columns = $schema_manager->listTableColumns($sanitized_table);
+            ddd($columns);
         }
         return [];
     }
