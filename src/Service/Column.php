@@ -41,6 +41,7 @@ class Column extends Main
                     $record['type'] = $column->getType()->getBindingType();
                     $list[]= $record;
                 }
+                d($list);
                 return $list;
             }
         }
