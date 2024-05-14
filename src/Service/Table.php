@@ -143,8 +143,6 @@ class Table extends Main
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         $tables = Table::all($object, $name, $environment);
-        d($tables);
-        d($options->table);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         if(in_array($sanitized_table, $tables, true)){
             $schema_manager->dropTable($sanitized_table);
