@@ -68,6 +68,7 @@ class Schema {
                             }
                             $platform = Database::platform($object, $config->name, $config->environment);
                             if($platform){
+                                d('has platform');
                                 SchemaService::sql($object,
                                     $options['class'],
                                     $options['role'],
