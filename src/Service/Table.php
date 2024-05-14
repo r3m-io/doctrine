@@ -68,6 +68,26 @@ class Table extends Main
     /**
      * @throws Exception
      */
+    public static function truncate($object, $name, $environment=null, $options=[]): array
+    {
+        $name = str_replace('.', '-', $name);
+        $environment = str_replace('.', '-', $environment);
+        ddd($options);
+        $schema_manager = Database::schema_manager($object, $name, $environment);
+        if(!$schema_manager){
+            Database::instance($object, $name, $environment);
+            $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
+        $tables = [];
+        if($schema_manager){
+            $tables = $schema_manager->listTableNames();
+        }
+        return $tables;
+    }
+
+    /**
+     * @throws Exception
+     */
     public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
         $name = str_replace('.', '-', $name);
