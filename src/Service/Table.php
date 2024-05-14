@@ -82,11 +82,27 @@ class Table extends Main
         }
         $connection = Database::connection($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
-        $sql = 'TRUNCATE TABLE ' . $sanitized_table;
+        $driver = Database::driver($object, $name, $environment);
+        switch($driver){
+            case 'pdo_mysql':
+                $sql = 'TRUNCATE TABLE ' . $sanitized_table;
+                break;
+            case 'pdo_sqlite':
+                $sql = 'DELETE FROM ' . $sanitized_table;
+                break;
+            default:
+                throw new Exception('Driver not supported.');
+
+        }
         if($connection){
             try {
                 $stmt = $connection->prepare($sql);
                 $result = $stmt->executeStatement();
+                if($driver === 'pdo_sqlite'){
+                    $sql = 'VACUUM';
+                    $stmt = $connection->prepare($sql);
+                    $result = $stmt->executeStatement();
+                }
                 d($result);
                 return true;
             }
