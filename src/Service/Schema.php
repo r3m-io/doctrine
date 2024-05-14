@@ -1413,6 +1413,10 @@ class Schema extends Main
                     if(array_key_exists('id', $schema_options)){
                         unset($schema_options['id']);
                     }
+                    if(array_key_exists('definition', $schema_options)){
+                        $schema_options['columnDefinition'] = $schema_options['definition'];
+                        unset($schema_options['definition']);
+                    }
                     d($schema_options);
                     if(!empty($schema_options)) {
                         $schema_table->addColumn($column->name, $column->type, $schema_options);
