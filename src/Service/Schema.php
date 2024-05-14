@@ -1415,11 +1415,6 @@ class Schema extends Main
                         unset($schema_options['id']);
                     }
                     if(!empty($schema_options)) {
-                        if($column->name === 'id'){
-                            $column->type = 'integer';
-                        }
-                        d($column->type);
-                        d($schema_options);
                         $schema_table->addColumn($column->name, $column->type, $schema_options);
                     }
                 } else {
@@ -1427,7 +1422,6 @@ class Schema extends Main
                 }
             }
         }
-        d($columns);
         if($node->has('primary_key')){
             $schema_table->setPrimaryKey($node->get('primary_key'));
         }
