@@ -70,8 +70,12 @@ class Table extends Main
      */
     public static function truncate($object, $name, $environment=null, $options=[]): array
     {
+        if($environment === null){
+            $environment = $object->config('environment');
+        } else {
+            $environment = str_replace('.', '-', $environment);
+        }
         $name = str_replace('.', '-', $name);
-        $environment = str_replace('.', '-', $environment);
         ddd($options);
         $schema_manager = Database::schema_manager($object, $name, $environment);
         if(!$schema_manager){
