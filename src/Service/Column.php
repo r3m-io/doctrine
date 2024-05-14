@@ -38,7 +38,8 @@ class Column extends Main
                 $list = [];
                 foreach($columns as $column){
                     $record = $column->toArray();
-                    d($record);
+                    $record['type'] = $column->getType()->getName();
+                    $list[]= $record;
                 }
                 return $list;
             }
