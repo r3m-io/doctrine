@@ -1407,6 +1407,7 @@ class Schema extends Main
             if(property_exists($column, 'type')){
                 if(property_exists($column, 'options')){
                     $schema_options = (array) $column->options;
+                    ddd($schema_options);
                     if(array_key_exists('nullable', $schema_options)){
                         $schema_options['notnull'] = !$schema_options['nullable'];
                         unset($schema_options['nullable']);
