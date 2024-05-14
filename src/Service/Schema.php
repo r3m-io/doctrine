@@ -1407,15 +1407,15 @@ class Schema extends Main
             if(property_exists($column, 'type')){
                 if(property_exists($column, 'options')){
                     $schema_options = (array) $column->options;
-                    ddd($schema_options);
                     if(array_key_exists('nullable', $schema_options)){
                         $schema_options['notnull'] = !$schema_options['nullable'];
                         unset($schema_options['nullable']);
                     }
+                    if(array_key_exists('id', $schema_options)){
+                        ddd($node);
+                        unset($schema_options['id']);
+                    }
                     if(!empty($schema_options)) {
-                        if(array_key_exists('id', $schema_options)){
-                            unset($schema_options['id']);
-                        }
                         $schema_table->addColumn($column_name, $column->type, $schema_options);
                     }
                 } else {
