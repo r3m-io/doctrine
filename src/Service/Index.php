@@ -41,6 +41,7 @@ class Index extends Main
         $indexes = [];
         if($schema_manager){
             $indexes = $schema_manager->listTableIndexes($sanitized_table);
+            ddd($indexes);
         }
         return $indexes;
     }
