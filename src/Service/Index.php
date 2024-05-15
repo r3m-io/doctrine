@@ -52,7 +52,6 @@ class Index extends Main
                     'flags' => $index->getFlags(),
                     'options' => $index->getOptions(),
                     'namespace' => $index->getNamespaceName(),
-                    'is_default_namespace' => $index->IsInDefaultNamespace(),
                     'name' => $index->getName(),
                     'is_quoted' => $index->isQuoted(),
                     'name_quoted' => $index->getQuotedName(),
