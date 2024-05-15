@@ -96,13 +96,11 @@ trait Main {
     }
 
     /**
-     * @throws Exception
+     * @throws ObjectException
      */
-    public function database_all($flags=null, $options=null): array
-    {
-        if(!property_exists($options, 'connection')){
-            throw new Exception('Option: connection not set...');
-        }
+    private function config($options=null){
+        $config = false;
+        $record = false;
         $object = $this->object();
         if(
             is_string($options->connection)
@@ -113,7 +111,6 @@ trait Main {
             is_array($options->connection)
         ) {
             $node = new Node($object);
-            $record = false;
             $environment = $options->environment ?? $object->config('framework.environment');
             foreach ($options->connection as $nr => $connection) {
                 if (!Core::is_uuid($connection)) {
@@ -165,8 +162,23 @@ trait Main {
         if(
             $record &&
             array_key_exists('node', $record)
-        ){
+        ) {
             $config = $record['node'];
+        }
+        return $config;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function database_all($flags=null, $options=null): array
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        $object = $this->object();
+        $config = $this->config($options);
+        if($config){
             if(
                 property_exists($config, 'name') &&
                 property_exists($config, 'environment')
