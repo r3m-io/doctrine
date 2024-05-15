@@ -278,7 +278,6 @@ class Table extends Main
                     'foreign_columns' => $foreign_key->getForeignColumns(),
                     'options' => $foreign_key->getOptions(),
                     'namespace' => $foreign_key->getNamespaceName(),
-                    'flags' => $foreign_key->getFlags(),
                     'is_quoted' => $foreign_key->isQuoted(),
                 ];
                 $foreign_keys[] = $record;
