@@ -1,46 +1,11 @@
 <?php
 namespace R3m\Io\Doctrine\Service;
 
-
-use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\Exception\NotSupported;
-use Doctrine\ORM\Mapping\Driver\AttributeReader;
-use Doctrine\ORM\Query\Parameter;
-use Entity\Role;
-use ReflectionObject;
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Mapping\OneToMany;
-use Doctrine\ORM\Mapping\OneToOne;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-
-use Host\Api\Workandtravel\World\Service\User as UserService;
-
 use R3m\Io\App;
 use R3m\Io\Module\Core;
 use R3m\Io\Module\Database;
-use R3m\Io\Module\File;
-use R3m\Io\Module\Limit;
-use R3m\Io\Module\Parse;
 
 use Exception;
-
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\Exception\ORMException;
-use Doctrine\ORM\Query\QueryException;
-
-use R3m\Io\Exception\AuthorizationException;
-use R3m\Io\Exception\ObjectException;
-use R3m\Io\Exception\FileWriteException;
-use Repository\PermissionRepository;
-
 
 class Table extends Main
 
@@ -51,8 +16,12 @@ class Table extends Main
      */
     public static function all($object, $name, $environment=null): array
     {
+        if($environment === null){
+            $environment = $object->config('environment');
+        } else {
+            $environment = str_replace('.', '-', $environment);
+        }
         $name = str_replace('.', '-', $name);
-        $environment = str_replace('.', '-', $environment);
         try {
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
@@ -154,9 +123,13 @@ class Table extends Main
      */
     public static function rename(App $object, $name, $environment=null, $options=[]): bool | string
     {
+        if($environment === null){
+            $environment = $object->config('environment');
+        } else {
+            $environment = str_replace('.', '-', $environment);
+        }
         $options = Core::object($options);
         $name = str_replace('.', '-', $name);
-        $environment = str_replace('.', '-', $environment);
         if(!property_exists($options, 'table')){
             throw new Exception('table not set in options');
         }
@@ -220,15 +193,22 @@ class Table extends Main
                     default:
                         throw new Exception('Driver not supported.');
                 }
-                $connection = Database::connection($object, $name, $environment);
-                if($connection){
-                    try {
-                        $stmt = $connection->prepare($sql);
-                        $result = $stmt->executeStatement();
-                    }
-                    catch(Exception $exception){
-                        ddd($exception);
-                    }
+                try {
+                    $connection = Database::connection($object, $name, $environment);
+                }
+                catch(Exception $exception){
+                    Database::instance($object, $name, $environment);
+                    $connection = Database::connection($object, $name, $environment);
+                }
+                if(!$connection){
+                    return false;
+                }
+                try {
+                    $stmt = $connection->prepare($sql);
+                    $result = $stmt->executeStatement();
+                }
+                catch(Exception $exception){
+                   return false;
                 }
                 return $sanitized_rename;
             }
