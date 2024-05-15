@@ -46,8 +46,6 @@ class Index extends Main
                 d(get_class_methods($index));
                 $record = (object) [
                     'column' => $index->getColumns(),
-                    'quoted_column' => $index->getQuotedColumns(),
-                    'unquoted_column' => $index->getUnQuotedColumns(),
                     'is_simple_index' => $index->isSimpleIndex(),
                     'is_unique' => $index->isUnique(),
                     'is_primary' => $index->isPrimary(),
