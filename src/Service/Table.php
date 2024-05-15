@@ -273,6 +273,7 @@ class Table extends Main
                 d($foreign_key);
 
                 $local_columns = $foreign_key->getLocalColumns();
+                d($local_columns);
                 $temp = [];
                 if(is_array($local_columns)){
                     foreach($local_columns as $local_column){
