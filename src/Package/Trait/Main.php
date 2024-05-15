@@ -11,6 +11,7 @@ use R3m\Io\Module\File;
 use R3m\Io\Node\Model\Node;
 
 use R3m\Io\Doctrine\Service\Table;
+use R3m\Io\Doctrine\Service\Index;
 use R3m\Io\Doctrine\Service\Column;
 
 
@@ -326,11 +327,34 @@ trait Main {
         return false;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function table_index_all($flags=null, $options=null): bool
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        if(!property_exists($options, 'table')){
+            throw new Exception('Option: table not set...');
+        }
+        $object = $this->object();
+        $config = $this->config($options);
+        if($config){
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                return Index::all($object, $config->name, $config->environment, $options);
+            }
+        }
+        return false;
+    }
 
     /**
      * @throws Exception
      */
-    public function column_all($flags=null, $options=null): array
+    public function table_column_all($flags=null, $options=null): array
     {
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
