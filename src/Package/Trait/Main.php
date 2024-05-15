@@ -98,6 +98,88 @@ trait Main {
     /**
      * @throws Exception
      */
+    public function database_all($flags=null, $options=null): array
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        $object = $this->object();
+        if(
+            is_string($options->connection)
+        ){
+            $options->connection = [$options->connection];
+        }
+        if(
+            is_array($options->connection)
+        ) {
+            $node = new Node($object);
+            $record = false;
+            $environment = $options->environment ?? $object->config('framework.environment');
+            foreach ($options->connection as $nr => $connection) {
+                if (!Core::is_uuid($connection)) {
+                    $class = 'System.Doctrine.Environment';
+                    $role = $node->role_system();
+                    $record = $node->record(
+                        $class,
+                        $role,
+                        [
+                            'filter' => [
+                                'name' => $connection,
+                                'environment' => $environment
+                            ]
+                        ]
+                    );
+                    if (
+                        $record &&
+                        array_key_exists('node', $record) &&
+                        property_exists($record['node'], 'uuid')
+                    ) {
+                        $options->connection[$nr] = $record['node']->uuid;
+                    } else {
+                        $record = $node->record(
+                            $class,
+                            $role,
+                            [
+                                'filter' => [
+                                    'name' => $connection,
+                                    'environment' => '*'
+                                ]
+                            ]
+                        );
+                        if (
+                            $record &&
+                            array_key_exists('node', $record) &&
+                            property_exists($record['node'], 'uuid')
+                        ) {
+                            $options->connection[$nr] = $record['node']->uuid;
+                        } else {
+                            throw new Exception('Environment not found...');
+                        }
+                    }
+                    if($record){
+                        break;
+                    }
+                }
+            }
+        }
+        if(
+            $record &&
+            array_key_exists('node', $record)
+        ){
+            $config = $record['node'];
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                return Database::all($object, $config->name, $config->environment);
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @throws Exception
+     */
     public function table_all($flags=null, $options=null): array
     {
         if(!property_exists($options, 'connection')){
