@@ -243,7 +243,7 @@ class Table extends Main
     /**
      * @throws Exception
      */
-    public static function table_foreign_keys(App $object, $name, $environment=null, $options=null)
+    public static function foreign_keys(App $object, $name, $environment=null, $options=null)
     {
         if (!property_exists($options, 'table')) {
             throw new Exception('table not set in options');

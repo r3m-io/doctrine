@@ -354,6 +354,30 @@ trait Main {
     /**
      * @throws Exception
      */
+    public function table_foreign_keys($flags=null, $options=null): bool | array
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        if(!property_exists($options, 'table')){
+            throw new Exception('Option: table not set...');
+        }
+        $object = $this->object();
+        $config = $this->config($options);
+        if($config){
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                return Table::foreign_keys($object, $config->name, $config->environment, $options);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
     public function table_column_all($flags=null, $options=null): array
     {
         if(!property_exists($options, 'connection')){
