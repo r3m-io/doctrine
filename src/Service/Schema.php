@@ -1383,7 +1383,6 @@ class Schema extends Main
         elseif(is_array($node)){
             $node = new Data($node);
         }
-        d($node);
         $config = false;
         if(array_key_exists('config', $options)){
             $config = $options['config'];
@@ -1450,7 +1449,8 @@ class Schema extends Main
         $sql = $schema->toSql($platform);
         if($sql){
             foreach($sql as $line){
-                echo $line . ';' . PHP_EOL;
+                //add to log
+//                echo $line . ';' . PHP_EOL;
             }
             $connection = Database::connection($object, $config->name, $config->environment);
             if($connection){
