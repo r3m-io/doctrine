@@ -42,7 +42,9 @@ class Index extends Main
         if($schema_manager){
             $list = $schema_manager->listTableIndexes($sanitized_table);
             foreach($list as $index){
-                $indexes[] = $index->toArray();
+                ddd(get_class_methods($index));
+
+//                $indexes[] = $index->toArray();
             }
             ddd($indexes);
         }
