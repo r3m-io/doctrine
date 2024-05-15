@@ -183,7 +183,6 @@ class Table extends Main
             }
         }
         elseif(is_string($options->rename)){
-            d($options->rename);
             if(
                 in_array(
                     $options->rename,
@@ -191,7 +190,6 @@ class Table extends Main
                     true
                 )
             ){
-                d('yes');
                 //log to sql exception
                 return false;
             }
@@ -201,8 +199,6 @@ class Table extends Main
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
         $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
         // Construct the SQL query with the sanitized table names
-        d($sanitized_table);
-        d($sanitized_rename);
         if(
             strlen($sanitized_table) >= 2 &&
             strlen($sanitized_rename) >= 2
@@ -226,7 +222,6 @@ class Table extends Main
                     Database::instance($object, $name, $environment);
                     $connection = Database::connection($object, $name, $environment);
                 } catch(Exception $exception){
-                    d($exception);
                     return false;
                 }
             }
@@ -238,8 +233,6 @@ class Table extends Main
                 $result = $stmt->executeStatement();
             }
             catch(Exception $exception){
-                d($sql);
-                d($exception);
                return false;
             }
             return $sanitized_rename;
