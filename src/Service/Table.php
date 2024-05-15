@@ -56,7 +56,18 @@ class Table extends Main
         if(!property_exists($options, 'table')){
             throw new Exception('table not set in options');
         }
-        $connection = Database::connection($object, $name, $environment);
+        try {
+            $connection = Database::connection($object, $name, $environment);
+        }
+        catch(Exception $exception){
+            try {
+                Database::instance($object, $name, $environment);
+                $connection = Database::connection($object, $name, $environment);
+            }
+            catch(Exception $exception){
+                return false;
+            }
+        }
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         $driver = Database::driver($object, $name, $environment);
         $reset = false;
@@ -70,26 +81,24 @@ class Table extends Main
                 break;
             default:
                 throw new Exception('Driver not supported.');
-
         }
-        if($connection){
-            try {
-                $stmt = $connection->prepare($sql);
-                $result = $stmt->executeStatement();
-                if($driver === 'pdo_sqlite' && $reset){
-                    try {
-                        $stmt = $connection->prepare($reset);
-                        $result = $stmt->executeStatement();
-                    }
-                    catch(Exception $exception){
-                    }
+        try {
+            $stmt = $connection->prepare($sql);
+            $result = $stmt->executeStatement();
+            if($driver === 'pdo_sqlite' && $reset){
+                try {
+                    $stmt = $connection->prepare($reset);
+                    $result = $stmt->executeStatement();
                 }
-                return true;
+                catch(Exception $exception){
+                    return false;
+                }
             }
-            catch(Exception $exception){
-            }
+            return true;
         }
-        return false;
+        catch(Exception $exception){
+            return false;
+        }
     }
 
     /**
