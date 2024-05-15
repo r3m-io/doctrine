@@ -1450,12 +1450,14 @@ class Schema extends Main
         $sql = $schema->toSql($platform);
         if($sql){
             foreach($sql as $line){
-                echo $line . PHP_EOL;
+                echo $line . ';' . PHP_EOL;
             }
             $connection = Database::connection($object, $config->name, $config->environment);
             if($connection){
-                $stmt = $connection->prepare(implode(';' . PHP_EOL, $sql) . ';');
-                $result = $stmt->executeQuery();
+                foreach($sql as $line){
+                    $stmt = $connection->prepare($line);
+                    $result = $stmt->executeQuery();
+                }
             }
         }
     }
