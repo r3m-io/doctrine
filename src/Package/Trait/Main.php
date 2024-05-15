@@ -213,6 +213,47 @@ trait Main {
     /**
      * @throws Exception
      */
+    public function table_has($flags=null, $options=null): array
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        if(!property_exists($options, 'table')){
+            throw new Exception('Option: table not set...');
+        }
+        $object = $this->object();
+        $config = $this->config($options);
+        if($config){
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                $tables = Table::all($object, $config->name, $config->environment);
+                if(is_string($options->table)){
+                    $options->table = [$options->table];
+                }
+                if(is_array($options->table)){
+                    foreach($options->table as $table){
+                        if(
+                            !in_array(
+                                $table,
+                                $tables,
+                                true
+                            )
+                        ){
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @throws Exception
+     */
     public function table_truncate($flags=null, $options=null): bool
     {
         if(!property_exists($options, 'connection')){
