@@ -26,8 +26,13 @@ class Table extends Main
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         catch(Exception $exception){
-            Database::instance($object, $name, $environment);
-            $schema_manager = Database::schema_manager($object, $name, $environment);
+            try {
+                Database::instance($object, $name, $environment);
+                $schema_manager = Database::schema_manager($object, $name, $environment);
+            }
+            catch(Exception $exception){
+                return [];
+            }
         }
         $tables = [];
         if($schema_manager){
