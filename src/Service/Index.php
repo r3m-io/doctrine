@@ -37,9 +37,10 @@ class Index extends Main
                 return [];
             }
         }
+        $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         $indexes = [];
         if($schema_manager){
-            $indexes = $schema_manager->listTableIndexes();
+            $indexes = $schema_manager->listTableIndexes($sanitized_table);
         }
         return $indexes;
     }
