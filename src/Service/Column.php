@@ -26,10 +26,19 @@ class Column extends Main
         if (!property_exists($options, 'table')) {
             throw new Exception('table not set in options');
         }
-        $schema_manager = Database::schema_manager($object, $name, $environment);
-        if (!$schema_manager) {
-            Database::instance($object, $name, $environment);
+        try {
             $schema_manager = Database::schema_manager($object, $name, $environment);
+        }
+        catch (Exception $exception) {
+            try {
+                Database::instance($object, $name, $environment);
+                $schema_manager = Database::schema_manager($object, $name, $environment);
+            } catch (Exception $exception) {
+                return [];
+            }
+        }
+        if (!$schema_manager) {
+            return [];
         }
         $tables = Table::all($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
