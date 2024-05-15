@@ -56,7 +56,8 @@ class Index extends Main
                     'namespace' => $index->getNamespaceName(),
                     'is_default_namespace' => $index->getIsInDefaultNamespace(),
                     'name' => $index->getName(),
-
+                    'is_quoted' => $index->isQuoted(),
+                    'name_quoted' => $index->getQuotedName(),
                 ];
                 $indexes[] = $record;
             }
