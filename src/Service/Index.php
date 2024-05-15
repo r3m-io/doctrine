@@ -40,7 +40,10 @@ class Index extends Main
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         $indexes = [];
         if($schema_manager){
-            $indexes = $schema_manager->listTableIndexes($sanitized_table);
+            $list = $schema_manager->listTableIndexes($sanitized_table);
+            foreach($list as $index){
+                $indexes[] = $index->toArray();
+            }
             ddd($indexes);
         }
         return $indexes;
