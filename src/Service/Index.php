@@ -42,9 +42,23 @@ class Index extends Main
         if($schema_manager){
             $list = $schema_manager->listTableIndexes($sanitized_table);
             foreach($list as $index){
-                ddd(get_class_methods($index));
+                d($index);
+                d(get_class_methods($index));
+                $record = (object) [
+                    'column' => $index->getColumns(),
+                    'quoted_column' => $index->getQuotedColumns(),
+                    'unquoted_column' => $index->getUnQuotedColumns(),
+                    'is_simple_index' => $index->isSimpleIndex(),
+                    'is_unique' => $index->isUnique(),
+                    'is_primary' => $index->isPrimary(),
+                    'flags' => $index->getFlags(),
+                    'options' => $index->getOptions(),
+                    'namespace' => $index->getNamespaceName(),
+                    'is_default_namespace' => $index->getIsInDefaultNamespace(),
+                    'name' => $index->getName(),
 
-//                $indexes[] = $index->toArray();
+                ];
+                $indexes[] = $record;
             }
             ddd($indexes);
         }
