@@ -14,7 +14,7 @@ class Table extends Main
     /**
      * @throws Exception
      */
-    public static function all($object, $name, $environment=null): array
+    public static function all(App $object, $name, $environment=null): array
     {
         if($environment === null){
             $environment = $object->config('environment');
@@ -44,7 +44,7 @@ class Table extends Main
     /**
      * @throws Exception
      */
-    public static function truncate($object, $name, $environment=null, $options=null): bool
+    public static function truncate(App $object, $name, $environment=null, $options=null): bool
     {
         $options = Core::object($options);
         if($environment === null){
@@ -104,7 +104,7 @@ class Table extends Main
     /**
      * @throws Exception
      */
-    public static function delete($object, $name, $environment=null, $options=null): bool
+    public static function delete(App $object, $name, $environment=null, $options=null): bool
     {
         $options = Core::object($options);
         if($environment === null){
@@ -147,85 +147,90 @@ class Table extends Main
         if(!property_exists($options, 'table')){
             throw new Exception('table not set in options');
         }
-        if(property_exists($options, 'rename')){
-            $tables = Table::all($object, $name, $environment);
-            $table = '';
-            $rename = '';
-            if($options->rename === true){
-                //new table name _old_nr
-                $table = $options->table;
-                $rename = $table . '_old';
-                $counter = 1;
-                while(true){
-                    if(
-                        in_array(
-                            $rename,
-                            $tables,
-                            true
-                        ) === false
-                    ){
-                        break;
-                    }
-                    $rename = $table . '_old_' . $counter;
-                    $counter++;
-                    if(
-                        $counter >= PHP_INT_MAX ||
-                        $counter < 0
-                    ){
-                        throw new Exception('Out of range.');
-                    }
-                }
-            }
-            elseif(is_string($options->rename)){
+        if(!property_exists($options, 'rename')){
+            $options->rename = true;
+        }
+        $tables = Table::all($object, $name, $environment);
+        $table = '';
+        $rename = '';
+        if($options->rename === true){
+            //new table name _old_nr
+            $table = $options->table;
+            $rename = $table . '_old';
+            $counter = 1;
+            while(true){
                 if(
                     in_array(
-                        $options->rename,
+                        $rename,
                         $tables,
                         true
-                    )
+                    ) === false
                 ){
-                    return false;
+                    break;
                 }
-                $rename = $options->rename;
-                //new table name
+                $rename = $table . '_old_' . $counter;
+                $counter++;
+                if(
+                    $counter >= PHP_INT_MAX ||
+                    $counter < 0
+                ){
+                    throw new Exception('Out of range.');
+                }
             }
-            $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
-            $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
-            // Construct the SQL query with the sanitized table names
+        }
+        elseif(is_string($options->rename)){
             if(
-                strlen($sanitized_table) >= 2 &&
-                strlen($sanitized_rename) >= 2
+                in_array(
+                    $options->rename,
+                    $tables,
+                    true
+                )
             ){
-                $driver = Database::driver($object, $name, $environment);
-                switch($driver){
-                    case 'pdo_mysql':
-                        $sql = 'RENAME TABLE ' . $sanitized_table . ' TO ' . $sanitized_rename;
-                        break;
-                    case 'pdo_sqlite':
-                        $sql = 'ALTER TABLE ' . $sanitized_table . ' RENAME TO ' . $sanitized_rename;
-                        break;
-                    default:
-                        throw new Exception('Driver not supported.');
-                }
+                return false;
+            }
+            $rename = $options->rename;
+            //new table name
+        }
+        $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $table);
+        $sanitized_rename = preg_replace('/[^a-zA-Z0-9_]/', '', $rename);
+        // Construct the SQL query with the sanitized table names
+        if(
+            strlen($sanitized_table) >= 2 &&
+            strlen($sanitized_rename) >= 2
+        ){
+            $driver = Database::driver($object, $name, $environment);
+            switch($driver){
+                case 'pdo_mysql':
+                    $sql = 'RENAME TABLE ' . $sanitized_table . ' TO ' . $sanitized_rename;
+                    break;
+                case 'pdo_sqlite':
+                    $sql = 'ALTER TABLE ' . $sanitized_table . ' RENAME TO ' . $sanitized_rename;
+                    break;
+                default:
+                    throw new Exception('Driver not supported.');
+            }
+            try {
+                $connection = Database::connection($object, $name, $environment);
+            }
+            catch(Exception $exception){
                 try {
-                    $connection = Database::connection($object, $name, $environment);
-                }
-                catch(Exception $exception){
                     Database::instance($object, $name, $environment);
                     $connection = Database::connection($object, $name, $environment);
-                }
-                if(!$connection){
+                } catch(Exception $exception){
                     return false;
                 }
-                try {
-                    $stmt = $connection->prepare($sql);
-                    $result = $stmt->executeStatement();
-                }
-                catch(Exception $exception){
-                   return false;
-                }
-                return $sanitized_rename;
             }
+            if(!$connection){
+                return false;
+            }
+            try {
+                $stmt = $connection->prepare($sql);
+                $result = $stmt->executeStatement();
+            }
+            catch(Exception $exception){
+               return false;
+            }
+            return $sanitized_rename;
         }
         return false;
     }
