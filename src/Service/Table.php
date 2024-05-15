@@ -156,11 +156,10 @@ class Table extends Main
             $options->rename = true;
         }
         $tables = Table::all($object, $name, $environment);
-        $table = '';
+        $table = $options->table;
         $rename = '';
         if($options->rename === true){
             //new table name _old_nr
-            $table = $options->table;
             $rename = $table . '_old';
             $counter = 1;
             while(true){
