@@ -184,6 +184,7 @@ class Table extends Main
             }
         }
         elseif(is_string($options->rename)){
+            d($options->rename);
             if(
                 in_array(
                     $options->rename,
@@ -234,6 +235,8 @@ class Table extends Main
                 $result = $stmt->executeStatement();
             }
             catch(Exception $exception){
+                d($sql);
+                d($exception);
                return false;
             }
             return $sanitized_rename;
