@@ -330,7 +330,7 @@ trait Main {
     /**
      * @throws Exception
      */
-    public function table_index_all($flags=null, $options=null): bool
+    public function table_index_all($flags=null, $options=null): bool | array
     {
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
