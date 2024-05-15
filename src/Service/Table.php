@@ -224,6 +224,7 @@ class Table extends Main
                     Database::instance($object, $name, $environment);
                     $connection = Database::connection($object, $name, $environment);
                 } catch(Exception $exception){
+                    d($exception);
                     return false;
                 }
             }
