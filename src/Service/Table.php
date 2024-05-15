@@ -120,8 +120,13 @@ class Table extends Main
             $schema_manager = Database::schema_manager($object, $name, $environment);
         }
         catch(Exception $exception){
-            Database::instance($object, $name, $environment);
-            $schema_manager = Database::schema_manager($object, $name, $environment);
+            try {
+                Database::instance($object, $name, $environment);
+                $schema_manager = Database::schema_manager($object, $name, $environment);
+            }
+            catch (Exception $exception){
+                return false;
+            }
         }
         $tables = Table::all($object, $name, $environment);
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
@@ -186,6 +191,7 @@ class Table extends Main
                     true
                 )
             ){
+                //log to sql exception
                 return false;
             }
             $rename = $options->rename;
