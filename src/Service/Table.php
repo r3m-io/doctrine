@@ -269,41 +269,11 @@ class Table extends Main
         if ($schema_manager) {
             $list = $schema_manager->listTableForeignKeys($sanitized_table);
             foreach ($list as $foreign_key) {
-                d(get_class_methods($foreign_key));
-                d($foreign_key);
-
-                $local_columns = $foreign_key->getLocalColumns();
-                d($local_columns);
-                $temp = [];
-                if(is_array($local_columns)){
-                    foreach($local_columns as $local_column){
-                        $record = (object) [
-                            'name' => $local_column->getName(),
-                            'namespace' => $local_column->getNamespaceName(),
-                            'is_quoted' => $local_column->isQuoted(),
-                        ];
-                        $temp[] = $record;
-                    }
-                }
-                $local_columns = $temp;
-                $foreign_columns = $foreign_key->getForeignColumns();
-                $temp = [];
-                if(is_array($foreign_columns)){
-                    foreach($foreign_columns as $foreign_columns){
-                        $record = (object) [
-                            'name' => $foreign_columns->getName(),
-                            'namespace' => $foreign_columns->getNamespaceName(),
-                            'is_quoted' => $foreign_columns->isQuoted(),
-                        ];
-                        $temp[] = $record;
-                    }
-                }
-                $foreign_columns = $temp;
                 $record = (object) [
                     'name' => $foreign_key->getName(),
-                    'local_columns' => $local_columns,
+                    'local_columns' => $foreign_key->getLocalColumns(),
                     'foreign_table' => $foreign_key->getForeignTableName(),
-                    'foreign_columns' => $foreign_columns,
+                    'foreign_columns' =>$foreign_key->getForeignColumns(),
                     'options' => $foreign_key->getOptions(),
                     'namespace' => $foreign_key->getNamespaceName(),
                     'is_quoted' => $foreign_key->isQuoted(),
