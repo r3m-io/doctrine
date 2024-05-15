@@ -402,6 +402,27 @@ trait Main {
     /**
      * @throws Exception
      */
+    public function sequence_all($flags=null, $options=null): array
+    {
+        if(!property_exists($options, 'connection')){
+            throw new Exception('Option: connection not set...');
+        }
+        $object = $this->object();
+        $config = $this->config($options);
+        if($config){
+            if(
+                property_exists($config, 'name') &&
+                property_exists($config, 'environment')
+            ){
+                return Sequence::all($object, $config->name, $config->environment, $options);
+            }
+        }
+        return [];
+    }
+
+    /**
+     * @throws Exception
+     */
     public function schema_import($flags=null, $options=null): void
     {
         $object = $this->object();
