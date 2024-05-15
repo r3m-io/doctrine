@@ -267,9 +267,21 @@ class Table extends Main
         $sanitized_table = preg_replace('/[^a-zA-Z0-9_]/', '', $options->table);
         $foreign_keys = [];
         if ($schema_manager) {
-            $list = $schema_manager->listTableForeignkeys($sanitized_table);
+            $list = $schema_manager->listTableForeignKeys($sanitized_table);
             foreach ($list as $foreign_key) {
+                d(get_class_methods($foreign_key));
                 d($foreign_key);
+                $record = (object) [
+                    'name' => $foreign_key->getName(),
+                    'local_columns' => $foreign_key->getLocalColumns(),
+                    'foreign_table' => $foreign_key->getForeignTableName(),
+                    'foreign_columns' => $foreign_key->getForeignColumns(),
+                    'options' => $foreign_key->getOptions(),
+                    'namespace' => $foreign_key->getNamespaceName(),
+                    'flags' => $foreign_key->getFlags(),
+                    'is_quoted' => $foreign_key->isQuoted(),
+                ];
+                $foreign_keys[] = $record;
             }
         }
         return $foreign_keys;
