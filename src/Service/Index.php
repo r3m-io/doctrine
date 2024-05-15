@@ -42,8 +42,6 @@ class Index extends Main
         if($schema_manager){
             $list = $schema_manager->listTableIndexes($sanitized_table);
             foreach($list as $index){
-                d($index);
-                d(get_class_methods($index));
                 $record = (object) [
                     'column' => $index->getColumns(),
                     'is_simple_index' => $index->isSimpleIndex(),
@@ -57,7 +55,6 @@ class Index extends Main
                 ];
                 $indexes[] = $record;
             }
-            ddd($indexes);
         }
         return $indexes;
     }
