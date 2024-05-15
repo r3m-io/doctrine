@@ -29,7 +29,6 @@ class Schema {
 
         if(array_key_exists('node', $options)){
             $node = $options['node'];
-            ddd($node);
             if(property_exists($node, 'environment')){
                 if(
                     is_array($node->environment) ||
@@ -38,6 +37,7 @@ class Schema {
                     foreach($node->environment as $name => $environments){
                         foreach($environments as $environment => $config){
                             $config->table = Table::all($object, $config->name, $config->environment);
+                            d($config);
                             if(in_array($node->table, $config->table, true)){
                                 $table = Table::rename(
                                     $object,
@@ -48,6 +48,7 @@ class Schema {
                                         'rename' => true
                                     ]
                                 );
+                                d($table);
                                 if($is_entity === false){
                                     SchemaService::entity($object,
                                         $options['class'],
