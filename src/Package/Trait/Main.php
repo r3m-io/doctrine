@@ -13,6 +13,7 @@ use R3m\Io\Node\Model\Node;
 use R3m\Io\Doctrine\Service\Table;
 use R3m\Io\Doctrine\Service\Index;
 use R3m\Io\Doctrine\Service\Column;
+use R3m\Io\Doctrine\Service\Sequence;
 
 
 use Exception;
