@@ -49,49 +49,8 @@ class Column extends Main
                 foreach($columns as $column){
                     $record = $column->toArray();
                     $record['type'] = File::basename(get_class($column->getType()));
-                    switch(strtolower($record['type'])){
-                        case 'integertype':
-                            $record['type'] = 'integer';
-                            break;
-                        case 'smallinttype':
-                            $record['type'] = 'smallint';
-                            break;
-                        case 'tinyinttype':
-                            $record['type'] = 'tinyint';
-                            break;
-                        case 'biginttype':
-                            $record['type'] = 'bigint';
-                            break;
-                        case 'stringtype':
-                            $record['type'] = 'string';
-                            break;
-                        case 'texttype':
-                            $record['type'] = 'text';
-                            break;
-                        case 'booleantype':
-                            $record['type'] = 'boolean';
-                            break;
-                        case 'floattype':
-                            $record['type'] = 'float';
-                            break;
-                        case 'decimaltype':
-                            $record['type'] = 'decimal';
-                            break;
-                        case 'binarytype':
-                            $record['type'] = 'binary';
-                            break;
-                        case 'datetimetype':
-                            $record['type'] = 'datetime';
-                            break;
-                        case 'datetimetztype':
-                            $record['type'] = 'datetimetz';
-                            break;
-                        case 'timetype':
-                            $record['type'] = 'time';
-                            break;
-                        default:
-                            throw new Exception('unknown type: ' . $record['type']);
-                    }
+                    $explode = explode('Type', $record['type'], 2);
+                    $record['type'] = strtolower($explode[0]);
                     $list[]= $record;
                 }
                 return $list;
