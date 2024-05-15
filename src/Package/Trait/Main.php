@@ -213,7 +213,7 @@ trait Main {
     /**
      * @throws Exception
      */
-    public function table_has($flags=null, $options=null): array
+    public function table_has($flags=null, $options=null): bool
     {
         if(!property_exists($options, 'connection')){
             throw new Exception('Option: connection not set...');
