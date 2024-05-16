@@ -16,6 +16,8 @@ class Sequence extends Main
      */
     public static function all(App $object, $name, $environment=null, $options=null): array
     {
+        //both mysql & sqlite do not support sequences
+        throw new Exception('Operation "Doctrine\DBAL\Platforms\AbstractPlatform::getListSequencesSQL" is not supported by platform.');
         if($environment === null){
             $environment = $object->config('environment');
         } else {

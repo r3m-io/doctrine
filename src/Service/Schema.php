@@ -3,6 +3,7 @@ namespace R3m\Io\Doctrine\Service;
 
 use R3m\Io\App;
 
+use R3m\Io\Module\Core;
 use R3m\Io\Module\Data;
 use R3m\Io\Module\Controller;
 use R3m\Io\Module\Database;
@@ -1440,9 +1441,11 @@ class Schema extends Main
         if($node->has('index')){
             foreach($node->get('index') as $index){
                 if(is_array($index)){
-                    $schema_table->addIndex($index , 'idx_' . implode('_', $index));
+//                    $schema_table->addIndex($index , 'idx_' . implode('_', $index) . '_' . str_replace('-','_', Core::uuid()));
+                    $schema_table->addIndex($index);
                 } else {
-                    $schema_table->addIndex([$index] , 'idx_' . $index);
+//                    $schema_table->addIndex([$index] , 'idx_' . $index);
+                    $schema_table->addIndex([$index]);
                 }
             }
         }
