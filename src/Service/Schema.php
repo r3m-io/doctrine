@@ -1441,10 +1441,8 @@ class Schema extends Main
         if($node->has('index')){
             foreach($node->get('index') as $index){
                 if(is_array($index)){
-//                    $schema_table->addIndex($index , 'idx_' . implode('_', $index) . '_' . str_replace('-','_', Core::uuid()));
                     $schema_table->addIndex($index);
                 } else {
-//                    $schema_table->addIndex([$index] , 'idx_' . $index);
                     $schema_table->addIndex([$index]);
                 }
             }
